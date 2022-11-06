@@ -15,17 +15,21 @@ import click
 @click.option('--endpoint', help='IBM Cloud API endpoint')
 @click.option('--compute-iam-endpoint', help='IAM endpoint url used for compute instead of default https://iam.cloud.ibm.com')
 def builder(iam_api_key, output_file, input_file, version, endpoint, compute_iam_endpoint):
-    iam_api_key =os.environ["RESEARCH"]
+    print(color_msg("DEBUGGING - API KEY HARDCODED", color=Color.RED))
+    print(color_msg("DEBUGGING - Source file is TEST.yaml", color=Color.RED))
+    test = True
+
+    iam_api_key = os.environ["RESEARCH"]
     if version:
-        print(f"{pkg_resources.get_distribution('ibm-ray-config').project_name} "
-              f"{pkg_resources.get_distribution('ibm-ray-config').version}")
+        print(f"{pkg_resources.get_distribution('').project_name} "
+              f"{pkg_resources.get_distribution('').version}")
         exit(0)
 
-    print(color_msg("\nWelcome to ...\n", color=Color.YELLOW))
+    print(color_msg("\nWelcome to GPU supported image generator\n", color=Color.YELLOW))
 
 
     # if input_file is empty, path to defaults.py is returned.
-    input_file, output_file = verify_paths(input_file, output_file)
+    input_file, output_file = verify_paths(input_file, output_file,test=test)
 
     
     with open(input_file) as f:
@@ -38,9 +42,8 @@ def builder(iam_api_key, output_file, input_file, version, endpoint, compute_iam
     for module in modules:
         next_module = module(base_config)
         base_config = next_module.run()
-
-    with open(output_file, 'w') as outfile:
-        yaml.dump(base_config, outfile, default_flow_style=False)
+    
+    print(color_msg("\nProgram finished. All modules ran successfully\n", color=Color.YELLOW))
 
 def validate_api_keys(base_config, iam_api_key, compute_iam_endpoint):
     """validates the api key specified.

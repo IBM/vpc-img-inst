@@ -1,35 +1,24 @@
-import logging
 from config_builder import ConfigBuilder
 from typing import Any, Dict
-from utils import free_dialog, get_option_from_list
-
-logger = logging.getLogger(__name__)
+from utils import free_dialog, get_option_from_list, color_msg, Color, logger
 
 class FloatingIpConfig(ConfigBuilder):
+    def __init__(self, base_config: Dict[str, Any]) -> None:
+        super().__init__(base_config)
+        self.base_config = base_config
     
     def run(self) -> Dict[str, Any]:
-        fip_address = None 
-        floating_ips = self.ibm_vpc_client.list_floating_ips().get_result()['floating_ips']
-        # filter away floating-ips that are already bound, or belong to a zone different than the one chosen by user  
-        free_floating_ips = [ip for ip in floating_ips if not ip.get('target') and self.base_config['zone_name']==ip['zone']['name']] 
-
-        ALLOCATE_NEW_FLOATING_IP = 'Allocate new floating ip'
-        chosen_ip_data = get_option_from_list("Choose head ip", free_floating_ips, choice_key='address', do_nothing=ALLOCATE_NEW_FLOATING_IP)
-        if chosen_ip_data == ALLOCATE_NEW_FLOATING_IP:
-            fip_address = self.create_and_attach_ip(floating_ips)
-        elif chosen_ip_data:
-            fip_address = chosen_ip_data['address']
-        else:
-            raise Exception("IP is required to connect to the VSI")     
-
-        self.base_config['node_config']['ip'] = fip_address
+        fip_data = self.create_ip()
+        self.base_config['node_config']['ip'] = fip_data['address']
+        self.base_config['node_config']['id'] = fip_data['id']
         return self.base_config
 
-    def create_and_attach_ip(self, floating_ips):
-        fip_name = free_dialog("please specify a name for your new ip address")['answer']
+    def create_ip(self):
+        floating_ips = self.ibm_vpc_client.list_floating_ips().get_result()['floating_ips']
+        # fip_name = free_dialog("please specify a name for your new ip address")['answer']
         fip_names = [fip['name'] for fip in floating_ips]
 
-        default_ip_name = fip_name
+        default_ip_name = fip_name = "temp-fp"
         c = 1
         while default_ip_name in fip_names:    # find next available floating ip name
             default_ip_name = f'{fip_name}-{c}'
@@ -44,7 +33,12 @@ class FloatingIpConfig(ConfigBuilder):
 
         response = self.ibm_vpc_client.create_floating_ip(floating_ip_prototype)
         floating_ip_data = response.result
-        logger.debug(f"Created floating ip: {floating_ip_data['address']}")
+        print(color_msg(f"Created floating ip: {floating_ip_data['address']} with id: {floating_ip_data['id']}", color=Color.LIGHTGREEN))
+        
+        self.attach_ip(floating_ip_data)
+        return floating_ip_data
+    
+    def attach_ip(self, floating_ip_data):
         # Attach the ip to the VSI's network interface
         instance_data = self.ibm_vpc_client.get_instance(self.base_config['node_config']['vsi_id']).get_result()
         try:

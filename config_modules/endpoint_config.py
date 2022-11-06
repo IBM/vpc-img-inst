@@ -1,7 +1,7 @@
-
+import logging
 from config_builder import ConfigBuilder, update_decorator, spinner
 from typing import Any, Dict
-from utils import get_option_from_list, get_region_by_endpoint
+from utils import get_option_from_list, get_region_by_endpoint,color_msg, Color, logger
 
 
 class EndpointConfig(ConfigBuilder):
@@ -15,37 +15,17 @@ class EndpointConfig(ConfigBuilder):
         
     @update_decorator
     def run(self) -> Dict[str, Any]:
-
         regions_objects = self._get_regions_objects()
-        
-        default = self.defaults.get('region')
-        region_obj = get_option_from_list("Choose region", regions_objects, default = default)
-        base_endpoint = self.base_config.get('endpoint')
-
-        # update global ibm_vpc_client to selected endpoint
-        ConfigBuilder.ibm_vpc_client.set_service_url(region_obj['endpoint'] + '/v1')
+        region_obj = next((r for r in regions_objects if r['name'] == 'us-south'), None) # hardcoded for us-south
+        ConfigBuilder.ibm_vpc_client.set_service_url(region_obj['endpoint'] + '/v1')   # update global ibm_vpc_client to selected endpoint
         ConfigBuilder.region = region_obj['name']
-        self.defaults['region'] = get_region_by_endpoint(
-                base_endpoint) if base_endpoint else None
         
+        logger.info(f"Region Chosen: {region_obj['name']} ")
         return region_obj['endpoint']
 
     def update_config(self, endpoint):
         self.base_config['endpoint'] = endpoint
         self.base_config['region'] = ConfigBuilder.region
-    
-    @update_decorator
-    def create_default(self):
-        # update global ibm_vpc_client to selected endpoint
-        regions_objects = self._get_regions_objects()
-        
-        # currently hardcoded for us-south
-        region_obj = next((r for r in regions_objects if r['name'] == 'us-south'), None)
-        
-        ConfigBuilder.ibm_vpc_client.set_service_url(region_obj['endpoint'] + '/v1')
-        ConfigBuilder.region = region_obj['name']
-        
-        return region_obj['endpoint']
 
 
 

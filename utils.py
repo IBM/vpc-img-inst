@@ -11,12 +11,13 @@ from inquirer import errors
 from ibm_platform_services import IamIdentityV1
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 import ibm_cloud_sdk_core
+import logging
 
-DIR_PATH = os.path.dirname(os.path.realpath(__file__))
-
-CACHE = {}
+logging.basicConfig(level = logging.INFO)
+logger = logging.getLogger(__name__)
+DIR_PATH = os.path.dirname(os.path.realpath(__file__))  # absolute path to project's root folder.
 ARG_STATUS = Enum('STATUS', 'VALID INVALID MISSING')  # variable possible status.
-
+CACHE = {}
 class MSG_STATUS(Enum):
     ERROR = '[ERROR]'
     WARNING = '[WARNING]'
@@ -262,7 +263,7 @@ def run_cmd(cmd):
     process.wait()
 
 
-def verify_paths(input_path, output_path, verify_config=False):
+def verify_paths(input_path, output_path, verify_config=False, test=False):
     """:returns a valid input and output path files, in accordance with provided paths.
         if a given path is invalid, and user is unable to rectify, a default path will be chosen in its stead. """
 
@@ -293,11 +294,8 @@ def verify_paths(input_path, output_path, verify_config=False):
                 path = free_dialog(request)['answer']
 
     if not verify_config:
-        
-        # input_path = _prompt_user(input_path, f'{DIR_PATH}/defaults.yaml', _is_valid_input_path,
-        #                           "Provide a path to your existing config file, or leave blank to configure from template",
-        #                           'Using default input file\n')
-        input_path = _prompt_user(input_path, f'{DIR_PATH}/DELETE.yaml', _is_valid_input_path,
+        template_file = "TEST" if test else "defaults"
+        input_path = _prompt_user(input_path, f'{DIR_PATH}/{template_file}.yaml', _is_valid_input_path,
                                   "Provide a path to your existing config file, or leave blank to configure from template",
                                   'Using default input file\n')
     output_path = _prompt_user(output_path, tempfile.mkstemp(suffix='.yaml')[1], _is_valid_output_path,
@@ -372,3 +370,17 @@ class Background(Enum):
     PURPLE = '45'
     CYAN = '46'
     LIGHTGREY = '47'
+
+def get_unique_file_name(name, path):
+    from os.path import isfile, join
+
+    files = [f for f in os.listdir(path) if isfile(join(path, f))]
+    return path + os.sep + get_unique_name(name, files)
+
+def get_unique_name(name,names_list):
+    unique_name = name
+    c = 1
+    while unique_name in names_list:    # find next default available vpc name
+        unique_name = f'{name}-{c}'
+        c += 1
+    return unique_name

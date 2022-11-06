@@ -1,9 +1,7 @@
-import logging
 from typing import Any, Dict
 from config_builder import ConfigBuilder, update_decorator
-from utils import password_dialog, color_msg, Color, verify_iam_api_key, get_option_from_list, free_dialog
+from utils import password_dialog, color_msg, Color, verify_iam_api_key, get_option_from_list, free_dialog, logger
 from ibm_cloud_sdk_core import ApiException
-logger = logging.getLogger(__name__)
 
 class VSIConfig(ConfigBuilder):
 
@@ -34,7 +32,7 @@ class VSIConfig(ConfigBuilder):
         }
 
         vsi_names =  [vsi['name'] for vsi in server_instances]
-        vsi_name = default_vsi_name = "gpu-vsi"
+        vsi_name = default_vsi_name = "temp-vsi"
 
         c = 1
         while default_vsi_name in vsi_names:    # find next available vsi name
@@ -42,7 +40,7 @@ class VSIConfig(ConfigBuilder):
             c += 1
 
         boot_volume_profile = {
-            "capacity": self.base_config["node_config"].get("boot_volume_capacity", 100),
+            "capacity": self.base_config["node_config"]["boot_volume_capacity"] if self.base_config["node_config"]["boot_volume_capacity"] else 100,
             "name": "{}-boot".format(default_vsi_name),
             "profile": {
                 "name": self.base_config["node_config"].get("volume_tier_name", "general-purpose")
@@ -55,7 +53,8 @@ class VSIConfig(ConfigBuilder):
         }
 
         key_identity_model = {"id": self.base_config["node_config"]["key_id"]}
-        profile_name = self.base_config["node_config"].get("instance_profile_name", "bx2-2x8")
+        profile_name = self.base_config["node_config"]["instance_profile_name"]
+        profile_name = "bx2-2x8" if not profile_name else profile_name
 
         instance_prototype = {}
         instance_prototype["name"] = default_vsi_name
@@ -84,5 +83,5 @@ class VSIConfig(ConfigBuilder):
                 )
             raise e
 
-        logger.info("VM instance {} created successfully ".format(default_vsi_name))
+        print(color_msg(f"Created VM instance: {default_vsi_name} with id: {self.base_config['node_config']['vpc_id']}",color=Color.LIGHTGREEN))
         return resp.result
