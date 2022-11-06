@@ -3,23 +3,47 @@ from typing import Any, Dict
 from subprocess import Popen, PIPE
 from utils import DIR_PATH
 import paramiko
+import logging
+import time
+from utils import free_dialog, get_option_from_list, color_msg, Color, logger, DIR_PATH, get_unique_file_name
 
-from utils import free_dialog, get_option_from_list
 
 class CudaInstall(ConfigBuilder):
     def __init__(self, base_config: Dict[str, Any]) -> None:
         super().__init__(base_config)
 
     def run(self) -> Dict[str, Any]:
-
         @spinner
         def _run_remote_script():
+            install_log = get_unique_file_name("installation_log", DIR_PATH)
+            print(color_msg(f"\nInstalling Cuda in newly created VSI\n. See logs at {install_log}. Process might take a while.", color=Color.YELLOW))
             stdout = client.exec_command(f'chmod 777 {destination}/{file_to_execute}')[1] # returns the tuple (stdin,stdout,stderr)
             stdout = client.exec_command(f'{destination}/{file_to_execute}')[1]
-            for line in stdout:
-                print(line)
-            # with open("installation_log.txt", "a") as f:
-            #     f.write(stdout)
+            
+            with open(install_log, "a") as f:
+                for line in stdout:
+                    f.write(line)
+
+            # Blocking call
+            exit_status = stdout.channel.recv_exit_status()          
+            if exit_status == 0:
+                print(color_msg("Cuda installation script executed successfully",color=Color.GREEN))
+            else:
+                print(color_msg("Error executing script",color=Color.RED))
+
+        
+        def connect_to_ssh_port():
+            tries = 10
+            msg = "Failed to connect to ssh port"
+            while tries:
+                try:
+                    client.connect(self.base_config['node_config']['ip'], username=self.base_config['auth']['ssh_user'])
+                    return 
+                except:
+                    print(msg + ". Retrying..." if tries > 0 else msg)
+                    tries -= 1
+                    time.sleep(5)
+            raise
         
         # file_to_execute = 'test.sh'
         file_to_execute = 'install_cuda.sh'
@@ -28,7 +52,7 @@ class CudaInstall(ConfigBuilder):
         # Connect to remote host
         client = paramiko.SSHClient()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(self.base_config['node_config']['ip'], username=self.base_config['auth']['ssh_user'])
+        connect_to_ssh_port()
 
         # Setup sftp connection and transmit script
         sftp = client.open_sftp()
