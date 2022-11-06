@@ -1,5 +1,5 @@
 auth:
-    ssh_user: root
+    ssh_user: ""
     # you must specify paths to matching private and public key pair files
     # use `ssh-keygen -t rsa -b 4096` to generate a new ssh key pair
     ssh_private_key: ~/.ssh/id_rsa
@@ -17,8 +17,8 @@ node_config:
     security_group_id: ""
     subnet_id: ""
     key_id: ""
-    image_id: "r006-3e7bdf31-21f8-4726-b1ea-ee53d3c589dc"
-    instance_profile_name: "bx2-2x8"  # cheapest profile  
+    image_id: ""
+    instance_profile_name: ""  
     boot_volume_capacity: 100
     volume_tier_name: general-purpose
 

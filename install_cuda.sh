@@ -10,7 +10,7 @@ apt-get install cuda -y
 apt-get install cuda-drivers-520
 systemctl enable nvidia-persistenced
 file="/etc/profile.d/cuda-exports.sh"
-cat <<EOF > $file
+cat<<EOF > $file
 export PATH=/usr/local/cuda/bin${PATH:+:${PATH}}
 export CUDA_HOME=/usr/local/cuda" 
 EOF 
