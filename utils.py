@@ -14,7 +14,7 @@ import ibm_cloud_sdk_core
 import logging
 
 logging.basicConfig(level = logging.INFO)
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))  # absolute path to project's root folder.
 ARG_STATUS = Enum('STATUS', 'VALID INVALID MISSING')  # variable possible status.
 CACHE = {}
@@ -294,7 +294,7 @@ def verify_paths(input_path, output_path, verify_config=False, test=False):
                 path = free_dialog(request)['answer']
 
     if not verify_config:
-        template_file = "TEST" if test else "defaults"
+        template_file = "TEST/TEST" if test else "defaults"
         input_path = _prompt_user(input_path, f'{DIR_PATH}/{template_file}.yaml', _is_valid_input_path,
                                   "Provide a path to your existing config file, or leave blank to configure from template",
                                   'Using default input file\n')
@@ -372,10 +372,13 @@ class Background(Enum):
     LIGHTGREY = '47'
 
 def get_unique_file_name(name, path):
+    """returns the path to a file holding a unique name within the specified path"""
     from os.path import isfile, join
-
+    if path[-1] != os.sep:
+        path += os.sep
     files = [f for f in os.listdir(path) if isfile(join(path, f))]
-    return path + os.sep + get_unique_name(name, files)
+
+    return path + get_unique_name(name, files)
 
 def get_unique_name(name,names_list):
     unique_name = name

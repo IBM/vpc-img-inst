@@ -7,9 +7,8 @@ from config_modules.vsi_config import VSIConfig
 from config_modules.image_config import ImageConfig
 from config_modules.install_cuda import CudaInstall
 from config_modules.gpu_image import GPUImage
+from config_modules.delete_resources import DeleteResources
 
 
-# MODULES = [ApiKeyConfig,EndpointConfig, VPCConfig, ImageConfig,
-#             SshKeyConfig, VSIConfig, FloatingIpConfig, CudaInstall, GPUImage]
-
-MODULES = [ApiKeyConfig, GPUImage]
+MODULES = [ApiKeyConfig, EndpointConfig, VPCConfig, ImageConfig,
+            SshKeyConfig, VSIConfig, FloatingIpConfig, CudaInstall, GPUImage, DeleteResources]
