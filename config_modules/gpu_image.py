@@ -1,7 +1,6 @@
 from typing import Any, Dict
-from config_builder import ConfigBuilder, update_decorator
-from utils import password_dialog, color_msg, Color, verify_iam_api_key, get_option_from_list, free_dialog, logger
-from ibm_cloud_sdk_core import ApiException
+from config_builder import ConfigBuilder
+from utils import color_msg, Color, logger
 import time
 
 
@@ -16,7 +15,7 @@ class GPUImage(ConfigBuilder):
 
         images = self.ibm_vpc_client.list_images().get_result()
         image_names = [image['name'] for image in images['images']]
-        image_name = default_image_name = "gpu-image"
+        image_name = default_image_name = "cuda"+self.base_config['node_config']['image_name'] 
 
         c = 1
         while default_image_name in image_names:    # find next available vsi name
@@ -33,9 +32,7 @@ class GPUImage(ConfigBuilder):
             "source_volume": {"id": boot_volume_id}
             }      
         response = self.ibm_vpc_client.create_image(payload).result
-        logger.info("response:",response)
-        print(color_msg(f"Creating image: {default_image_name} with id: {response['id']}. Process may take a while, \
-                            please visit the UI to track its progress. ", Color.LIGHTGREEN))
+        print(color_msg(f"""Creating image: {default_image_name} with id: {response['id']}. Process may take a while, visit the UI to track its progress. """, Color.LIGHTGREEN))
 
         self.base_config['new_image_id'] = response['id']
         return self.base_config

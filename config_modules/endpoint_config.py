@@ -1,7 +1,7 @@
 import logging
 from config_builder import ConfigBuilder, update_decorator, spinner
 from typing import Any, Dict
-from utils import get_option_from_list, get_region_by_endpoint,color_msg, Color, logger
+from utils import color_msg, Color, logger, get_option_from_list
 
 
 class EndpointConfig(ConfigBuilder):
@@ -16,7 +16,7 @@ class EndpointConfig(ConfigBuilder):
     @update_decorator
     def run(self) -> Dict[str, Any]:
         regions_objects = self._get_regions_objects()
-        region_obj = next((r for r in regions_objects if r['name'] == 'us-south'), None) # hardcoded for us-south
+        region_obj = next((r for r in regions_objects if r['name'] == self.base_config['region']), None)
         ConfigBuilder.ibm_vpc_client.set_service_url(region_obj['endpoint'] + '/v1')   # update global ibm_vpc_client to selected endpoint
         ConfigBuilder.region = region_obj['name']
         

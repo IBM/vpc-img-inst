@@ -1,6 +1,6 @@
 from config_builder import ConfigBuilder
 from typing import Any, Dict
-from utils import free_dialog, get_option_from_list, color_msg, Color, logger
+from utils import color_msg, Color, logger
 
 class FloatingIpConfig(ConfigBuilder):
     def __init__(self, base_config: Dict[str, Any]) -> None:

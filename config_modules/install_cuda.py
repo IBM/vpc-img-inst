@@ -1,11 +1,9 @@
 from config_builder import ConfigBuilder, spinner
 from typing import Any, Dict
-from subprocess import Popen, PIPE
 from utils import DIR_PATH
 import paramiko
-import logging
 import time
-from utils import free_dialog, get_option_from_list, color_msg, Color, logger, DIR_PATH, get_unique_file_name
+from utils import color_msg, Color, logger, DIR_PATH, get_unique_file_name
 
 
 class CudaInstall(ConfigBuilder):
@@ -16,7 +14,7 @@ class CudaInstall(ConfigBuilder):
         @spinner
         def _run_remote_script():
             install_log = get_unique_file_name("installation_log", DIR_PATH)
-            print(color_msg(f"\nInstalling Cuda in newly created VSI\n. See logs at {install_log}. Process might take a while.", color=Color.YELLOW))
+            print(color_msg(f"\nInstalling Cuda in newly created VSI.\n- See logs at {install_log}. Process might take a while.", color=Color.YELLOW))
             stdout = client.exec_command(f'chmod 777 {destination}/{file_to_execute}')[1] # returns the tuple (stdin,stdout,stderr)
             stdout = client.exec_command(f'{destination}/{file_to_execute}')[1]
             
@@ -27,7 +25,7 @@ class CudaInstall(ConfigBuilder):
             # Blocking call
             exit_status = stdout.channel.recv_exit_status()          
             if exit_status == 0:
-                print(color_msg("Cuda installation script executed successfully",color=Color.GREEN))
+                print(color_msg("Cuda installation script executed successfully.",color=Color.GREEN))
             else:
                 print(color_msg("Error executing script",color=Color.RED))
 
@@ -43,6 +41,7 @@ class CudaInstall(ConfigBuilder):
                     print(msg + ". Retrying..." if tries > 0 else msg)
                     tries -= 1
                     time.sleep(5)
+            print(color_msg("\nFailed to connect to VSI via SSH. Terminating.\n", Color.RED))
             raise
         
         # file_to_execute = 'test.sh'

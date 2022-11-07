@@ -1,6 +1,6 @@
 from typing import Any, Dict
-from config_builder import ConfigBuilder, update_decorator
-from utils import password_dialog, color_msg, Color, verify_iam_api_key, get_option_from_list, free_dialog, logger
+from config_builder import ConfigBuilder
+from utils import color_msg, Color, logger
 from ibm_cloud_sdk_core import ApiException
 
 class VSIConfig(ConfigBuilder):

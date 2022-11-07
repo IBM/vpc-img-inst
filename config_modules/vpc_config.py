@@ -2,12 +2,8 @@ from typing import Any, Dict
 import logging
 import inquirer
 from config_builder import ConfigBuilder, update_decorator, spinner
-from utils import (find_default, find_name_id,
-                                        get_option_from_list,
-                                        get_region_by_endpoint,
-                                        validate_not_empty, CACHE)
-import logging
-logger = logging.getLogger(__name__)
+from utils import find_default,get_option_from_list,get_region_by_endpoint, CACHE, logger
+
 class VPCConfig(ConfigBuilder):
 
     def __init__(self, base_config: Dict[str, Any]) -> None:

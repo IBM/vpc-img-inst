@@ -116,6 +116,10 @@ class ConfigBuilder:
 
         iam_token_manager = IAMTokenManager(apikey=self.base_config['ibm']['iam_api_key'], url=ConfigBuilder.compute_iam_endpoint)
         return iam_token_manager.get_token()
+        
+    def verify_region(self, region):
+        """returns True if specified region value is valid"""
+        return region in [region['name'] for region in self.ibm_vpc_client.list_regions().get_result()['regions']]
 
 
 class Spinner(threading.Thread):
