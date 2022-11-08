@@ -1,11 +1,10 @@
-import importlib
 import pkg_resources
 import os
 import sys
 import click
 import yaml
 import config_modules
-from utils import color_msg, Color, verify_paths, get_confirmation
+from utils import color_msg, Color, verify_paths, get_confirmation, store_output
 # default values for the vsi on which the produced image will base upon  
 DEFAULTS = {'image_name':'ibm-ubuntu-20-04-4-minimal-amd64-2', 'region':'us_south'}
 
@@ -23,8 +22,8 @@ def builder(iam_api_key, output_file, input_file, version, region, auto, compute
     print(color_msg("DEBUGGING - API KEY HARDCODED", color=Color.RED))
     iam_api_key = os.environ["RESEARCH"]
 
-    print(color_msg("DEBUGGING - Source file is TEST.yaml", color=Color.RED))
-    test = True # affecting verify_paths()
+    # print(color_msg("DEBUGGING - Source file is TEST.yaml", color=Color.RED))
+    test = False # affecting verify_paths()
 
     if version:
         print(f"{pkg_resources.get_distribution('').project_name} "
@@ -36,10 +35,12 @@ def builder(iam_api_key, output_file, input_file, version, region, auto, compute
 
     # if input_file is empty, path to defaults.py is returned.
     input_file, output_file = verify_paths(input_file, output_file, test=test)
-
     
     with open(input_file) as f:
         base_config = yaml.safe_load(f)
+    
+    base_config['output_file'] = output_file
+
     base_config, modules = validate_api_keys(base_config, iam_api_key, compute_iam_endpoint)
     base_config['auto'] = auto
 

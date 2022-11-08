@@ -1,6 +1,6 @@
 from config_builder import ConfigBuilder
 from typing import Any, Dict
-from utils import color_msg, Color, logger
+from utils import color_msg, Color, logger, get_unique_name, store_output
 
 class FloatingIpConfig(ConfigBuilder):
     def __init__(self, base_config: Dict[str, Any]) -> None:
@@ -11,21 +11,15 @@ class FloatingIpConfig(ConfigBuilder):
         fip_data = self.create_ip()
         self.base_config['node_config']['ip'] = fip_data['address']
         self.base_config['node_config']['id'] = fip_data['id']
+        store_output({'ip':fip_data['address']},self.base_config)
         return self.base_config
 
     def create_ip(self):
         floating_ips = self.ibm_vpc_client.list_floating_ips().get_result()['floating_ips']
-        # fip_name = free_dialog("please specify a name for your new ip address")['answer']
-        fip_names = [fip['name'] for fip in floating_ips]
-
-        default_ip_name = fip_name = "temp-fp"
-        c = 1
-        while default_ip_name in fip_names:    # find next available floating ip name
-            default_ip_name = f'{fip_name}-{c}'
-            c += 1
+        ip_name = get_unique_name(name = "temp-fp", name_list = [fip['name'] for fip in floating_ips])
 
         floating_ip_prototype = {}
-        floating_ip_prototype["name"] = default_ip_name
+        floating_ip_prototype["name"] = ip_name
         floating_ip_prototype["zone"] = {"name": self.base_config['zone_name']}
         floating_ip_prototype["resource_group"] = {
             "id": self.base_config['node_config']["resource_group_id"]

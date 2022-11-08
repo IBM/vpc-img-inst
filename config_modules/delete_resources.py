@@ -1,8 +1,11 @@
 import logging
 import os
 import time
+import yaml
+import sys
 from typing import Any, Dict
-from config_builder import ConfigBuilder
+sys.path.append('../generate_gpu_image')
+from config_builder import ConfigBuilder, spinner
 from utils import color_msg, Color, logger
 from ibm_cloud_sdk_core import ApiException
 
@@ -10,6 +13,8 @@ class DeleteResources(ConfigBuilder):
     def __init__(self, base_config: Dict[str, Any]) -> None:
         super().__init__(base_config)
         self.base_config = base_config
+        if 'delete_resources' in base_config:
+            self.delete_config()
 
     def run(self) -> Dict[str, Any]:
         self.delete_config()
@@ -27,28 +32,17 @@ class DeleteResources(ConfigBuilder):
             self.ibm_vpc_client.delete_floating_ip(fip)
 
             print(color_msg('\n\nDeleted ip named: {} of address: {}'.format(fips[0]['name'], self.base_config['node_config']['ip']), color=Color.PURPLE))
-        
-        # delete instance        
-        self.ibm_vpc_client.delete_instance(instance_data['id'])
-        print(color_msg('Deleted VM instance named: {} with id: {}'.format(instance_data['name'], instance_data['id']), color=Color.PURPLE))
 
-        time.sleep(5)
-        
+        # delete instance
+        self.ibm_vpc_client.delete_instance(instance_data['id'])   
+        # blocking call
+        res=self.poll_instance_exists(instance_data['id'], instance_data['name'])
+
         # delete subnet
-        try:
-            self.ibm_vpc_client.delete_subnet(self.base_config["node_config"]['subnet_id'])
-        except ApiException as e:
-            if e.code == 404:
-                pass
-            else:
-                raise e
-            
-            time.sleep(25)
-        
-        print(color_msg('Deleted subnet id: {}'.format(self.base_config["node_config"]['subnet_id']), color=Color.PURPLE))
-        
+        self.ibm_vpc_client.delete_subnet(self.base_config["node_config"]['subnet_id'])
+        self.poll_subnet_exists(self.base_config["node_config"]['subnet_id'])
+
         # delete ssh key
-        time.sleep(5)
         try:
             self.ibm_vpc_client.delete_key(id=self.base_config["node_config"]['key_id'])
         except ApiException as e:
@@ -74,8 +68,6 @@ class DeleteResources(ConfigBuilder):
             print(color_msg("Failed to delete {public_key}"),Color.RED)
             print(e)
         
-        time.sleep(5)
-        
         # delete vpc
         try:
             self.ibm_vpc_client.delete_vpc(self.base_config["node_config"]['vpc_id'])
@@ -86,3 +78,89 @@ class DeleteResources(ConfigBuilder):
                 raise e
 
         print(color_msg('Deleted VPC named: {} with id: {}'.format(instance_data['vpc']['name'], self.base_config["node_config"]['vpc_id']), color=Color.PURPLE))
+
+    @spinner
+    def poll_instance_exists(self,instance_id,instance_name):
+        tries = 30 # waits up to 1 min with 2 sec interval
+        sleep_interval = 2
+        msg = ""
+        while tries:
+            try:
+                instance_data = self.ibm_vpc_client.get_instance(instance_id).result
+            except:
+                print(color_msg('Deleted VM instance named: {} with id: {}'.format(instance_name, instance_id), color=Color.PURPLE))
+                return True
+            
+            #print("Retrying... current status:", instance_data['status'])
+            tries -= 1
+            time.sleep(sleep_interval)
+        print(f"\Failed to delete instance within expected time frame of {tries*sleep_interval/60} minutes.\n")
+        return False
+
+    @spinner
+    def poll_subnet_exists(self,subnet_id):
+        tries = 30 # waits up to 1 min with 2 sec interval
+        sleep_interval = 2
+        msg = ""
+        while tries:
+            try:
+                subnet_data = self.ibm_vpc_client.get_instance(subnet_id).result
+            except:
+                print(color_msg('Deleted subnet id: {}'.format(self.base_config["node_config"]['subnet_id']), color=Color.PURPLE))
+                return True
+            
+            #print("Retrying... current status:", subnet_data['status'])
+            tries -= 1
+            time.sleep(sleep_interval)
+        print(f"\Failed to delete instance within expected time frame of {tries*sleep_interval/60} minutes.\n")
+        return False
+
+
+if __name__ == "__main__":
+    base_config = {'delete_resources':True}
+    
+    output_file = "/home/omer/dev1/generate_gpu_image/created_resources"
+    with open(output_file, 'r') as f:
+        resources = yaml.safe_load(f)
+    
+    node_config={"node_config":{"subnet_id":resources['subnet_id' if 'subnet_id' in resources else ''],
+                                 "vpc_id":resources['vpc_id'] if 'vpc_id' in resources else '',
+                                 "vsi_id":resources['vsi_id'] if 'vsi_id' in resources else '',
+                                 "key_id":resources['key_id'] if 'key_id' in resources else '',
+                                  "ip": resources['ip'] if 'ip' in resources else '' }
+                }
+    auth = {"auth":{"ssh_private_key":resources['ssh_private_key'] if 'ssh_private_key' in resources else ''}}
+    base_config.update({"iam_api_key": resources['iam_api_key']})
+    base_config.update(auth)
+    base_config.update(node_config)
+
+
+    # for manual use:
+
+    # api_key = os.environ['RESEARCH']
+    # base_config.update({"iam_api_key": api_key})
+    # node_config={"node_config":{"subnet_id":"",
+    #                              "vpc_id":"",
+    #                              "vsi_id":"",
+    #                              "key_id":"",
+    #                              "ip":""}
+    #             }
+    # auth = {"auth":{"ssh_private_key":""}}
+    # base_config.update(node_config)
+    # base_config.update(auth)
+
+
+    obj = DeleteResources(base_config)
+
+    if 'ip' in resources:
+        pass
+    if 'key_id' in resources:
+        pass
+    if 'vsi_id' in resources:
+        pass
+    if 'vpc_id' in resources:
+        pass
+    if 'ssh_private_key' in resources:
+        pass
+    if 'subnet_id' in resources:
+        pass

@@ -2,6 +2,7 @@ import os
 import subprocess
 from typing import Any, Dict
 from pathlib import Path
+from utils import store_output
 
 import inquirer
 from inquirer import errors
@@ -37,7 +38,7 @@ def register_ssh_key(ibm_vpc_client, config, ssh_key_objects):
     """Returns the key's name on the VPC platform, it's public key's contents and the local path to it.
         Registers an either existing or newly generated ssh-key to a specific VPC. """
     resource_group_id = config['node_config']['resource_group_id']
-    unique_key_name = get_unique_name(DEFAULT_KEY_NAME, ssh_key_objects)
+    unique_key_name = get_unique_name(name = DEFAULT_KEY_NAME, name_list = ssh_key_objects)
     ssh_key_data, ssh_key_path = generate_keypair()
 
     response = None
@@ -88,4 +89,6 @@ class SshKeyConfig(ConfigBuilder):
         self.base_config['node_config']['key_id'] = ssh_key_id
         self.base_config['auth']['ssh_user'] = 'root' # user is hardcoded to root 
         self.base_config['auth']['ssh_private_key'] = ssh_key_path
+        store_output({'ssh_private_key':ssh_key_path},self.base_config)
+        store_output({'key_id':ssh_key_id},self.base_config)
         return self.base_config

@@ -1,6 +1,6 @@
 from typing import Any, Dict
 from config_builder import ConfigBuilder
-from utils import color_msg, Color, logger
+from utils import color_msg, Color, logger, get_unique_name, store_output
 from ibm_cloud_sdk_core import ApiException
 
 class VSIConfig(ConfigBuilder):
@@ -12,6 +12,7 @@ class VSIConfig(ConfigBuilder):
         selected_vsi = self.get_vsi()
 
         self.base_config['node_config']['vsi_id'] = selected_vsi['id']
+        store_output({'vsi_id':selected_vsi['id']},self.base_config)
         return self.base_config
 
 
@@ -30,18 +31,11 @@ class VSIConfig(ConfigBuilder):
             "subnet": subnet_identity_model,
             "security_groups": [security_group_identity_model],
         }
-
-        vsi_names =  [vsi['name'] for vsi in server_instances]
-        vsi_name = default_vsi_name = "temp-vsi"
-
-        c = 1
-        while default_vsi_name in vsi_names:    # find next available vsi name
-            default_vsi_name = f'{vsi_name}-{c}'
-            c += 1
+        vsi_name = get_unique_name(name = "temp-vsi", name_list = [vsi['name'] for vsi in server_instances])
 
         boot_volume_profile = {
             "capacity": self.base_config["node_config"]["boot_volume_capacity"] if self.base_config["node_config"]["boot_volume_capacity"] else 100,
-            "name": "{}-boot".format(default_vsi_name),
+            "name": "{}-boot".format(vsi_name),
             "profile": {
                 "name": self.base_config["node_config"].get("volume_tier_name", "general-purpose")
             },
@@ -57,7 +51,7 @@ class VSIConfig(ConfigBuilder):
         profile_name = "bx2-2x8" if not profile_name else profile_name
 
         instance_prototype = {}
-        instance_prototype["name"] = default_vsi_name
+        instance_prototype["name"] = vsi_name
         instance_prototype["keys"] = [key_identity_model]
         instance_prototype["profile"] = {"name": profile_name}
         instance_prototype["resource_group"] = {"id": self.base_config["node_config"]["resource_group_id"]}
@@ -69,7 +63,7 @@ class VSIConfig(ConfigBuilder):
         instance_prototype["primary_network_interface"] = primary_network_interface
 
         try:
-            resp = self.ibm_vpc_client.create_instance(instance_prototype) 
+            resp = self.ibm_vpc_client.create_instance(instance_prototype).result
         except ApiException as e:
             if e.code == 400 and "already exists" in e.message:
                 logger.error("VSI already exists")
@@ -83,5 +77,5 @@ class VSIConfig(ConfigBuilder):
                 )
             raise e
 
-        print(color_msg(f"Created VM instance: {default_vsi_name} with id: {self.base_config['node_config']['vpc_id']}",color=Color.LIGHTGREEN))
-        return resp.result
+        print(color_msg(f"Created VM instance: {vsi_name} with id: {resp['id']}",color=Color.LIGHTGREEN))
+        return resp

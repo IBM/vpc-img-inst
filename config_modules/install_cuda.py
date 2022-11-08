@@ -29,8 +29,9 @@ class CudaInstall(ConfigBuilder):
             else:
                 print(color_msg("Error executing script",color=Color.RED))
 
-        
+        @spinner
         def connect_to_ssh_port():
+            logger.info("connecting to ssh port")
             tries = 10
             msg = "Failed to connect to ssh port"
             while tries:
@@ -40,12 +41,12 @@ class CudaInstall(ConfigBuilder):
                 except:
                     print(msg + ". Retrying..." if tries > 0 else msg)
                     tries -= 1
-                    time.sleep(5)
+                    time.sleep(4)
             print(color_msg("\nFailed to connect to VSI via SSH. Terminating.\n", Color.RED))
             raise
         
         # file_to_execute = 'test.sh'
-        file_to_execute = 'install_cuda.sh'
+        file_to_execute = 'install_cuda_ubuntu.sh'
         destination = "/tmp"
 
         # Connect to remote host

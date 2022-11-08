@@ -1,6 +1,6 @@
 from config_builder import ConfigBuilder, update_decorator, spinner
 from typing import Any, Dict
-from utils import logger
+from utils import logger, color_msg, Color
 
 
 
@@ -16,6 +16,8 @@ class ImageConfig(ConfigBuilder):
             return self.ibm_vpc_client.list_images().get_result()['images']
             
         image_objects = get_image_objects()
+        print(color_msg("DEBUGGING - USING CUDA IMAGE", color=Color.RED))
+        # image = next((obj for obj in image_objects if obj['name'].startswith('ibm-ubuntu-20-04-')), None)
         image = next((obj for obj in image_objects if 'ibm-ubuntu-20-04-' in obj['name']), None)
         self.base_config['node_config']['image_id'] = image['id']
         self.base_config['node_config']['image_name'] = image['name']

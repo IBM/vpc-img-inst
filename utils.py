@@ -1,4 +1,4 @@
-import importlib
+import yaml
 import os
 import re
 import subprocess
@@ -262,8 +262,7 @@ def run_cmd(cmd):
     process.stdout.close()
     process.wait()
 
-
-def verify_paths(input_path, output_path, verify_config=False, test=False):
+def verify_paths(input_path, output_path, test=False):
     """:returns a valid input and output path files, in accordance with provided paths.
         if a given path is invalid, and user is unable to rectify, a default path will be chosen in its stead. """
 
@@ -282,26 +281,14 @@ def verify_paths(input_path, output_path, verify_config=False, test=False):
         else:
             print(color_msg(f"{prefix_directory} doesn't lead to an existing directory", color=Color.RED))
 
-    def _prompt_user(path, default_config_file, verify_func, request, default_msg):
-        while True:
-            if not path:
-                print(color_msg(default_msg, color=Color.LIGHTGREEN))
-                return default_config_file
+    template_file = "TEST/TEST" if test else "defaults"
+    if not input_path or not _is_valid_input_path(input_path):
+        input_path = f'{DIR_PATH}/{template_file}.yaml'
+    if not output_path or not _is_valid_output_path(output_path):
+        output_path = get_unique_file_name("created_resources",DIR_PATH)
 
-            if verify_func(path):
-                return path
-            else:
-                path = free_dialog(request)['answer']
-
-    if not verify_config:
-        template_file = "TEST/TEST" if test else "defaults"
-        input_path = _prompt_user(input_path, f'{DIR_PATH}/{template_file}.yaml', _is_valid_input_path,
-                                  "Provide a path to your existing config file, or leave blank to configure from template",
-                                  'Using default input file\n')
-    output_path = _prompt_user(output_path, tempfile.mkstemp(suffix='.yaml')[1], _is_valid_output_path,
-                               "Provide a custom path for your config file, or leave blank for default output location",
-                               'Using default output path\n')
     return input_path, output_path
+
 
 def verify_iam_api_key(answers, apikey, iam_endpoint=None):
     """Terminates the config tool if no IAM_API_KEY matching the provided value exists"""
@@ -380,10 +367,14 @@ def get_unique_file_name(name, path):
 
     return path + get_unique_name(name, files)
 
-def get_unique_name(name,names_list):
+def get_unique_name(name, name_list):
     unique_name = name
     c = 1
-    while unique_name in names_list:    # find next default available vpc name
+    while unique_name in name_list:    # find next default available vpc name
         unique_name = f'{name}-{c}'
         c += 1
     return unique_name
+
+def store_output(data:dict, config):
+    with open(config['output_file'], 'a') as file:
+        yaml.dump(data, file, default_flow_style=False)

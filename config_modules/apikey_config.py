@@ -1,7 +1,7 @@
 
 from typing import Any, Dict
 from config_builder import ConfigBuilder, update_decorator
-from utils import password_dialog, color_msg, Color, verify_iam_api_key
+from utils import password_dialog, color_msg, Color, verify_iam_api_key, store_output
 
 class ApiKeyConfig(ConfigBuilder):
 
@@ -22,6 +22,7 @@ class ApiKeyConfig(ConfigBuilder):
                                   validate=verify_iam_api_key)['answer']
 
         ConfigBuilder.iam_api_key = api_key
+        store_output({'iam_api_key':api_key},self.base_config)
         return api_key, compute_iam_endpoint
 
     def update_config(self, iam_api_key, compute_iam_endpoint=None) -> Dict[str, Any]:

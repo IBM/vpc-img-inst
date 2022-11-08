@@ -2,7 +2,7 @@ from typing import Any, Dict
 import logging
 import inquirer
 from config_builder import ConfigBuilder, update_decorator, spinner
-from utils import find_default,get_option_from_list,get_region_by_endpoint, CACHE, logger
+from utils import find_default,get_option_from_list,get_region_by_endpoint, CACHE, logger, get_unique_name, store_output
 
 class VPCConfig(ConfigBuilder):
 
@@ -44,8 +44,10 @@ class VPCConfig(ConfigBuilder):
                                                 'resource_group_id':CACHE['resource_group_id'],
                                                 'security_group_id':vpc_obj['default_security_group']['id'],
                                                 'subnet_id':subnet_objects[0]['id']})
-        self.base_config['zone_name'] = zone_obj['name']                                                
 
+        self.base_config['zone_name'] = zone_obj['name']                                                
+        store_output({'vpc_id':vpc_obj['id']},self.base_config)
+        store_output({"subnet_id":subnet_objects[0]['id']},self.base_config)
         return self.base_config
 
     def _build_security_group_rule_prototype_model(self, missing_rule, sg_id=None):
@@ -186,16 +188,9 @@ class VPCConfig(ConfigBuilder):
             resource_group_id = self._select_resource_group()
             resource_group = {'id': resource_group_id}
 
-            # Create a unique VPC name 
-            vpc_default_name = self.vpc_name
-            c = 1
-            vpc_names = [vpc_obj['name'] for vpc_obj in vpc_objects]
-            while vpc_default_name in vpc_names:    # find next default available vpc name
-                vpc_default_name = f'{self.vpc_name}-{c}'
-                c += 1
-
-            vpc_obj = _create_vpc(vpc_default_name)
-            vpc_name = vpc_obj['name']
+            # Create a unique VPC name
+            vpc_name = get_unique_name(name = self.vpc_name, name_list = [vpc_obj['name'] for vpc_obj in vpc_objects])
+            vpc_obj = _create_vpc(vpc_name)
             vpc_id = vpc_obj['id']
 
             print(f"\n\n\033[92mCreated VPC: {vpc_name} with id: {vpc_id}\033[0m")
