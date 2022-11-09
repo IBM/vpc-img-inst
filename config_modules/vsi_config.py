@@ -19,7 +19,7 @@ class VSIConfig(ConfigBuilder):
     def get_vsi(self):
         res = self.ibm_vpc_client.list_instances(vpc_id=self.base_config['node_config']['vpc_id'],
                                         resource_group_id=self.base_config['node_config']['resource_group_id']).get_result()
-        server_instances = [{'name':vsi['name'], "data": vsi} for vsi in res['instances']]   
+        server_instances = [{'name':vsi['name'], "data": vsi} for vsi in res['instances']]  
         return self.create_new_instance(server_instances)
      
     
@@ -32,10 +32,13 @@ class VSIConfig(ConfigBuilder):
             "security_groups": [security_group_identity_model],
         }
         vsi_name = get_unique_name(name = "temp-vsi", name_list = [vsi['name'] for vsi in server_instances])
+        res = self.ibm_vpc_client.list_volumes().get_result()
+        storage_volume_name = get_unique_name(vsi_name+"-boot",name_list = [vol['name'] for vol in res['volumes']]) 
+
 
         boot_volume_profile = {
             "capacity": self.base_config["node_config"]["boot_volume_capacity"] if self.base_config["node_config"]["boot_volume_capacity"] else 100,
-            "name": "{}-boot".format(vsi_name),
+            "name": storage_volume_name,
             "profile": {
                 "name": self.base_config["node_config"].get("volume_tier_name", "general-purpose")
             },
@@ -77,5 +80,5 @@ class VSIConfig(ConfigBuilder):
                 )
             raise e
 
-        print(color_msg(f"Created VM instance: {vsi_name} with id: {resp['id']}",color=Color.LIGHTGREEN))
+        logger.info(color_msg(f"Created VM instance: {vsi_name} with id: {resp['id']}",color=Color.LIGHTGREEN))
         return resp

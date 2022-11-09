@@ -7,7 +7,7 @@ from utils import store_output
 import inquirer
 from inquirer import errors
 from config_builder import ConfigBuilder, spinner
-from utils import Color, color_msg, get_unique_file_name, get_unique_name
+from utils import Color, color_msg, get_unique_file_name, get_unique_name,logger
 from ibm_cloud_sdk_core import ApiException
 DEFAULT_KEY_NAME = 'temp'
         
@@ -20,8 +20,8 @@ def generate_keypair():
 
     os.system(f'ssh-keygen -b 2048 -t rsa -f {unique_file_name} -q -N ""')
 
-    print(color_msg(f"Generated private key: {os.path.abspath(unique_file_name)}",color=Color.LIGHTGREEN))
-    print(color_msg(f"Generated public key: {os.path.abspath(unique_file_name)}.pub",color=Color.LIGHTGREEN))
+    logger.info(color_msg(f"Generated private key: {os.path.abspath(unique_file_name)}",color=Color.LIGHTGREEN))
+    logger.info(color_msg(f"Generated public key: {os.path.abspath(unique_file_name)}.pub",color=Color.LIGHTGREEN))
 
     with open(f"{unique_file_name}.pub", 'r') as file:
         ssh_key_data = file.read()
@@ -48,11 +48,11 @@ def register_ssh_key(ibm_vpc_client, config, ssh_key_objects):
     except ApiException as e:
         print(e)
         if "Key with fingerprint already exists" in e.message:
-            print(color_msg("Can't register an SSH key with the same fingerprint",Color.RED))
+            logger.info(color_msg("Can't register an SSH key with the same fingerprint",Color.RED))
         raise # can't continue the configuration process without a valid ssh key     
         
     result = response.get_result()
-    print(color_msg(f"Registered SSH key: {unique_key_name} with id: {result['id']} to resource group\n",Color.LIGHTGREEN))
+    logger.info(color_msg(f"Registered SSH key: {unique_key_name} with id: {result['id']} to resource group\n",Color.LIGHTGREEN))
     return result['name'], result['id'], ssh_key_path
 
 class SshKeyConfig(ConfigBuilder):

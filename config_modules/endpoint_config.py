@@ -17,6 +17,8 @@ class EndpointConfig(ConfigBuilder):
     def run(self) -> Dict[str, Any]:
         regions_objects = self._get_regions_objects()
         region_obj = next((r for r in regions_objects if r['name'] == self.base_config['region']), None)
+        if not region_obj:
+            raise Exception("Invalid region")
         ConfigBuilder.ibm_vpc_client.set_service_url(region_obj['endpoint'] + '/v1')   # update global ibm_vpc_client to selected endpoint
         ConfigBuilder.region = region_obj['name']
         

@@ -1,6 +1,6 @@
 from typing import Any, Dict
 from config_builder import ConfigBuilder, spinner
-from utils import color_msg, Color, logger
+from utils import color_msg, Color, logger, get_unique_name, store_output
 import time
 
 
@@ -15,12 +15,8 @@ class ImageCreate(ConfigBuilder):
 
         images = self.ibm_vpc_client.list_images().get_result()
         image_names = [image['name'] for image in images['images']]
-        image_name = default_image_name = "cuda"+self.base_config['node_config']['image_name'] 
-
-        c = 1
-        while default_image_name in image_names:    # find next available vsi name
-            default_image_name = f'{image_name}-{c}'
-            c += 1
+        default_image_name = "cuda-" + self.base_config['node_config']['image_name'] 
+        image_name = get_unique_name(default_image_name, image_names)
 
         self.ibm_vpc_client.create_instance_action(self.base_config['node_config']['vsi_id'], "stop")
         # blocks until instance stopped.
@@ -36,7 +32,7 @@ class ImageCreate(ConfigBuilder):
                     "resource_group":{"id":resource_group_id},
                     "source_volume": {"id": boot_volume_id}}    
         image_data = self.ibm_vpc_client.create_image(payload).result
-        print(color_msg(f"""Creating image: "{image_name}" with id: "{image_data['id']}". Process may take a while, visit the UI to track its progress. """, Color.LIGHTGREEN))
+        logger.info(color_msg(f"""Creating image: "{image_name}" with id: "{image_data['id']}". Process may take a while. """, Color.YELLOW))
   
         self.base_config['new_image_id'] = image_data['id']
         response = self.poll_image_status(image_data['id'],image_name)
@@ -49,16 +45,19 @@ class ImageCreate(ConfigBuilder):
         while tries:
             image_status = self.ibm_vpc_client.get_image(image_id).result['status']
             if image_status == 'available':
-                print(color_msg(f"""\nImage named: "{image_name}" with id: "{image_id}" was created successfully .\n""", Color.LIGHTGREEN))
+                logger.info(color_msg(f"""\nImage named: "{image_name}" with id: "{image_id}" was created successfully.\n""", Color.LIGHTGREEN))
+                store_output({"new_image":{'image_id':image_id, 'image_name':image_name}},self.base_config)
                 return True
             elif image_status in ['failed','unusable','deprecated','deleting']:
-                print(color_msg(f"failed to create image {image_id}.", Color.RED))
-                return False
+                logger.info(color_msg(f"failed to create image {image_id}. Retrying...", Color.RED))
+                time.sleep(10)
+                self.run()
+                # return False
             else:
                 # print(msg + ". Retrying..." if tries > 0 else msg)
                 tries -= 1
                 time.sleep(sleep_interval)
-        print(color_msg(f"Failed to create image {image_id} within the expected time frame of {tries*sleep_interval/60} minutes.\n", Color.RED))
+        logger.info(color_msg(f"Failed to create image {image_id} within the expected time frame of {tries*sleep_interval/60} minutes.\n", Color.RED))
         return False
 
     @spinner
@@ -71,11 +70,11 @@ class ImageCreate(ConfigBuilder):
             if instance_status == 'stopped':
                 return True
             elif instance_status in ['failed']:
-                print(color_msg("\nInstance failed to stop.\n",color=Color.RED))
+                logger.info(color_msg("\nInstance failed to stop.\n",color=Color.RED))
                 return False
             else:
                 # print("Retrying...")
                 tries -= 1
                 time.sleep(sleep_interval)
-        print(color_msg(f"\nInstance failed to stop within expected time frame of {tries*sleep_interval/60} minutes.\n",color=Color.LIGHTGREEN))
+        logger.info(color_msg(f"\nInstance failed to stop within expected time frame of {tries*sleep_interval/60} minutes.\n",color=Color.LIGHTGREEN))
         return False

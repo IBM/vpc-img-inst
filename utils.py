@@ -13,7 +13,7 @@ from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 import ibm_cloud_sdk_core
 import logging
 
-logging.basicConfig(level = logging.INFO)
+logging.basicConfig(level = logging.INFO,  format='%(asctime)s %(levelname)-8s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger()
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))  # absolute path to project's root folder.
 ARG_STATUS = Enum('STATUS', 'VALID INVALID MISSING')  # variable possible status.

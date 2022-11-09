@@ -9,9 +9,10 @@ class FloatingIpConfig(ConfigBuilder):
     
     def run(self) -> Dict[str, Any]:
         fip_data = self.create_ip()
-        self.base_config['node_config']['ip'] = fip_data['address']
-        self.base_config['node_config']['id'] = fip_data['id']
-        store_output({'ip':fip_data['address']},self.base_config)
+        self.base_config['node_config']['ip_address'] = fip_data['address']
+        self.base_config['node_config']['ip_id'] = fip_data['id']
+        store_output({'ip_id':fip_data['id']},self.base_config)
+        store_output({'ip_address':fip_data['address']},self.base_config)
         return self.base_config
 
     def create_ip(self):
@@ -27,7 +28,7 @@ class FloatingIpConfig(ConfigBuilder):
 
         response = self.ibm_vpc_client.create_floating_ip(floating_ip_prototype)
         floating_ip_data = response.result
-        print(color_msg(f"Created floating ip: {floating_ip_data['address']} with id: {floating_ip_data['id']}", color=Color.LIGHTGREEN))
+        logger.info(color_msg(f"Created floating ip: {floating_ip_data['address']} with id: {floating_ip_data['id']}", color=Color.LIGHTGREEN))
         
         self.attach_ip(floating_ip_data)
         return floating_ip_data

@@ -16,9 +16,9 @@ class ImageConfig(ConfigBuilder):
             return self.ibm_vpc_client.list_images().get_result()['images']
             
         image_objects = get_image_objects()
-        print(color_msg("DEBUGGING - USING CUDA IMAGE", color=Color.RED))
-        # image = next((obj for obj in image_objects if obj['name'].startswith('ibm-ubuntu-20-04-')), None)
-        image = next((obj for obj in image_objects if 'ibm-ubuntu-20-04-' in obj['name']), None)
+        image = next((obj for obj in image_objects if obj['name'].startswith(self.base_config['base_image_name'])), None)
+        # print(color_msg("DEBUGGING - USING CUDA IMAGE", color=Color.RED))
+        # image = next((obj for obj in image_objects if obj['name'].startswith("cuda")), None)
         self.base_config['node_config']['image_id'] = image['id']
         self.base_config['node_config']['image_name'] = image['name']
         self.base_config['node_config']['boot_volume_capacity'] = self.base_config['node_config'].get("boot_volume_capacity", 100)
