@@ -6,8 +6,9 @@ import yaml
 import config_modules
 from utils import color_msg, Color, verify_paths, get_confirmation, create_logs_folder, logger
 from config_modules.delete_resources import clean_up
+from constants import DEFAULTS
 # default values for the vsi on which the produced image will base upon  
-DEFAULTS = {'base_image_name':'ibm-ubuntu-20-04-4-minimal-amd64-2', 'region':'us-south', 'installation_type':"Ubuntu"}
+
 
 import click
 @click.command()
@@ -52,7 +53,7 @@ def builder(iam_api_key, output_file, input_file, version, region, yes, base_ima
     base_config['installation_type'] = installation_type if installation_type else DEFAULTS['installation_type']
     base_config['base_image_name'] = base_image_name if base_image_name else DEFAULTS['base_image_name']
     
-    logger.info(color_msg(f"""\nBase Image Name: {base_config['base_image_name']}\nInstallation Type:{base_config['installation_type']}\nRegion:{base_config['region']} """, color=Color.YELLOW))
+    logger.info(color_msg(f"""\nBase Image Name: {base_config['base_image_name']}\nInstallation Type:{base_config['installation_type']}\nRegion:{base_config['region']}\nImage Creation Retries:{DEFAULTS['image_create_retries']} """, color=Color.YELLOW))
     if not yes:
         confirmation = get_confirmation(f"Proceed?")['answer']
         if not confirmation:
