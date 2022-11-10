@@ -159,4 +159,10 @@ def _get_failed_images(file):
 
 
 if __name__ == "__main__":
-    clean_up()
+    resources_file = None
+    if len(sys.argv)>1:
+        resources_file = sys.argv[1]
+    if resources_file and not os.path.exists(os.path.abspath(os.path.expanduser(resources_file))):
+        logger.critical(color_msg("file doesn't exist in path",color=Color.RED))
+        sys.exit(1)
+    clean_up(resources_file)
