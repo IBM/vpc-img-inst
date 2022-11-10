@@ -9,21 +9,13 @@ class VSIConfig(ConfigBuilder):
         super().__init__(base_config)
 
     def run(self) -> Dict[str, Any]:
-        selected_vsi = self.get_vsi()
+        selected_vsi = self.create_new_instance()
 
         self.base_config['node_config']['vsi_id'] = selected_vsi['id']
         store_output({'vsi_id':selected_vsi['id']},self.base_config)
         return self.base_config
-
-
-    def get_vsi(self):
-        res = self.ibm_vpc_client.list_instances(vpc_id=self.base_config['node_config']['vpc_id'],
-                                        resource_group_id=self.base_config['node_config']['resource_group_id']).get_result()
-        server_instances = [{'name':vsi['name'], "data": vsi} for vsi in res['instances']]  
-        return self.create_new_instance(server_instances)
-     
     
-    def create_new_instance(self, server_instances):
+    def create_new_instance(self):
         security_group_identity_model = {"id": self.base_config["node_config"]["security_group_id"]}
         subnet_identity_model = {"id": self.base_config["node_config"]["subnet_id"]}
         primary_network_interface = {
