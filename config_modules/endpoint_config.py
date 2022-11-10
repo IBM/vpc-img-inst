@@ -1,7 +1,7 @@
 import logging
 from config_builder import ConfigBuilder, update_decorator, spinner
 from typing import Any, Dict
-from utils import color_msg, Color, logger, get_option_from_list
+from utils import logger
 
 
 class EndpointConfig(ConfigBuilder):

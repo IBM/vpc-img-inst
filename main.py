@@ -4,22 +4,24 @@ import sys
 import click
 import yaml
 import config_modules
-from utils import color_msg, Color, verify_paths, get_confirmation, store_output,logger
+from utils import color_msg, Color, verify_paths, get_confirmation, create_logs_folder, logger
+from config_modules.delete_resources import clean_up
 # default values for the vsi on which the produced image will base upon  
 DEFAULTS = {'base_image_name':'ibm-ubuntu-20-04-4-minimal-amd64-2', 'region':'us-south', 'installation_type':"Ubuntu"}
 
 import click
 @click.command()
-@click.option('--output-file', '-o', help='Output filename to save configurations')
+@click.option('--output-file', '-o', help='Log of resources created by this program')
 @click.option('--input-file', '-i', help=f'Template for the new configuration')
 @click.option('--iam-api-key', '-a', help='IAM_API_KEY')
 @click.option('--version', '-v', help=f'Get package version', is_flag=True)
 @click.option('--region', help='IBM Cloud region, e.g: us-south, us-east, eu-de, eu-gb')
 @click.option('--yes','-y',is_flag=True, help='Skips confirmation requests')
 @click.option('--base-image-name','-im', help='Base image name')
-@click.option('--installation-type','-it', help='type of Cuda installation to use, e.g. Ubuntu, Fedora, RHEL')
+@click.option('--installation-type','-it', help='type of CUDA installation to use, e.g. Ubuntu, Fedora, RHEL')
 @click.option('--compute-iam-endpoint', help='IAM endpoint url used for compute instead of default https://iam.cloud.ibm.com')
 def builder(iam_api_key, output_file, input_file, version, region, yes, base_image_name, installation_type, compute_iam_endpoint):
+    create_logs_folder()
 
     # print(color_msg("DEBUGGING - API KEY HARDCODED", color=Color.RED))
     # iam_api_key = os.environ["RESEARCH"]
@@ -58,7 +60,14 @@ def builder(iam_api_key, output_file, input_file, version, region, yes, base_ima
 
     for module in modules:
         next_module = module(base_config)
-        base_config = next_module.run()
+        try:
+            base_config = next_module.run()
+        except Exception as e:
+            logger.critical("Exception:\n",e)
+            logger.info(color_msg("Program failed, deleting created resources",color=Color.RED))
+            clean_up(output_file)
+            sys.exit(1)
+        
     
     logger.info(color_msg(f"\nProgram Concluded.\nCreated resources are logged in {output_file}.\n", color=Color.YELLOW))
 

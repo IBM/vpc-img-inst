@@ -1,6 +1,6 @@
 from typing import Any, Dict
 from config_builder import ConfigBuilder, spinner
-from utils import color_msg, Color, logger, get_unique_name, store_output
+from utils import color_msg, Color, logger, get_unique_name, store_output, append_random_suffix
 import time
 
 
@@ -12,11 +12,8 @@ class ImageCreate(ConfigBuilder):
     def run(self) -> Dict[str, Any]:
         instance_volume_attachments = self.ibm_vpc_client.list_instance_volume_attachments(self.base_config['node_config']['vsi_id']).get_result()
         boot_volume_id = instance_volume_attachments['volume_attachments'][0]['volume']['id']
-
-        images = self.ibm_vpc_client.list_images().get_result()
-        image_names = [image['name'] for image in images['images']]
         default_image_name = "cuda-" + self.base_config['node_config']['image_name'] 
-        image_name = get_unique_name(default_image_name, image_names)
+        image_name = append_random_suffix(base_name=default_image_name)
 
         self.ibm_vpc_client.create_instance_action(self.base_config['node_config']['vsi_id'], "stop")
         # blocks until instance stopped.
@@ -51,8 +48,8 @@ class ImageCreate(ConfigBuilder):
             elif image_status in ['failed','unusable','deprecated','deleting']:
                 logger.info(color_msg(f"failed to create image {image_id}. Retrying...", Color.RED))
                 time.sleep(10)
-                self.run()
-                # return False
+                self.run()  # retry
+                return True
             else:
                 # print(msg + ". Retrying..." if tries > 0 else msg)
                 tries -= 1
@@ -73,7 +70,6 @@ class ImageCreate(ConfigBuilder):
                 logger.info(color_msg("\nInstance failed to stop.\n",color=Color.RED))
                 return False
             else:
-                # print("Retrying...")
                 tries -= 1
                 time.sleep(sleep_interval)
         logger.info(color_msg(f"\nInstance failed to stop within expected time frame of {tries*sleep_interval/60} minutes.\n",color=Color.LIGHTGREEN))

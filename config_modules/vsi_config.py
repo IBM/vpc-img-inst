@@ -1,6 +1,6 @@
 from typing import Any, Dict
 from config_builder import ConfigBuilder
-from utils import color_msg, Color, logger, get_unique_name, store_output
+from utils import color_msg, Color, logger, store_output, append_random_suffix
 from ibm_cloud_sdk_core import ApiException
 
 class VSIConfig(ConfigBuilder):
@@ -31,9 +31,8 @@ class VSIConfig(ConfigBuilder):
             "subnet": subnet_identity_model,
             "security_groups": [security_group_identity_model],
         }
-        vsi_name = get_unique_name(name = "temp-vsi", name_list = [vsi['name'] for vsi in server_instances])
-        res = self.ibm_vpc_client.list_volumes().get_result()
-        storage_volume_name = get_unique_name(vsi_name+"-boot",name_list = [vol['name'] for vol in res['volumes']]) 
+        vsi_name = append_random_suffix(base_name="temp-vsi")
+        storage_volume_name = append_random_suffix(base_name=vsi_name+"-boot") 
 
 
         boot_volume_profile = {

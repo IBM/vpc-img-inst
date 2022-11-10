@@ -4,6 +4,7 @@ from utils import DIR_PATH
 import paramiko
 import time
 import sys
+import os
 from utils import color_msg, Color, logger, DIR_PATH, get_unique_file_name
 
 INST_FILES = {"Ubuntu":"install_cuda_ubuntu.sh"}
@@ -15,7 +16,7 @@ class CudaInstall(ConfigBuilder):
     def run(self) -> Dict[str, Any]:
         @spinner
         def _run_remote_script():
-            install_log = get_unique_file_name("installation_log", DIR_PATH)
+            install_log = get_unique_file_name("installation_log", DIR_PATH+os.sep+'logs')
             logger.info(color_msg(f"\nInstalling Cuda in newly created VSI.\n- See logs at {install_log}. Process might take a while.", color=Color.YELLOW))
             stdout = client.exec_command(f'chmod 777 {destination}/{file_to_execute}')[1] # returns the tuple (stdin,stdout,stderr)
             stdout = client.exec_command(f'{destination}/{file_to_execute}')[1]

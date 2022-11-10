@@ -6,7 +6,7 @@ import sys
 from typing import Any, Dict
 sys.path.append('../generate_gpu_image')
 from config_builder import ConfigBuilder, spinner
-from utils import color_msg, Color, logger
+from utils import color_msg, Color, logger, DIR_PATH
 from ibm_cloud_sdk_core import ApiException
 
 class DeleteResources(ConfigBuilder):
@@ -21,18 +21,6 @@ class DeleteResources(ConfigBuilder):
         return self.base_config
 
     def delete_config(self):
-
-        # instance_data = self.ibm_vpc_client.get_instance(self.base_config['node_config']['vsi_id']).get_result()
-        
-        # interface_id = instance_data['network_interfaces'][0]['id']
-        # fips = self.ibm_vpc_client.list_instance_network_interface_floating_ips(
-        #             instance_data['id'], interface_id).get_result()['floating_ips']
-        # if fips:
-        #     fip = fips[0]['id']
-        #     self.ibm_vpc_client.delete_floating_ip(fip)
-        #     print("---------------------------------------------")
-        #     logger.info(color_msg(f"""Deleted ip named: {fips[0]['name']} of address: {self.base_config['node_config']['ip']}""", color=Color.PURPLE))
-
         print("---------------------------------------------")
 
         if 'ip_id' in self.base_config['node_config'] and self.base_config['node_config']['ip_id']:
@@ -126,11 +114,11 @@ class DeleteResources(ConfigBuilder):
         return False
 
 
-if __name__ == "__main__":
+def clean_up(input_file=None):
     base_config = {'delete_resources':True}
     
-    output_file = "/home/omer/dev1/generate_gpu_image/created_resources-1"
-    with open(output_file, 'r') as f:
+    file = input_file if input_file else f"{DIR_PATH}{os.sep}logs{os.sep}created_resources"
+    with open(file, 'r') as f:
         resources = yaml.safe_load(f)
     
     node_config={"node_config":{"subnet_id":resources['subnet_id'] if 'subnet_id' in resources else '',
@@ -145,33 +133,7 @@ if __name__ == "__main__":
     base_config.update(auth)
     base_config.update(node_config)
 
-
-    # for manual use:
-
-    # api_key = os.environ['RESEARCH']
-    # base_config.update({"iam_api_key": api_key})
-    # node_config={"node_config":{"subnet_id":"",
-    #                              "vpc_id":"",
-    #                              "vsi_id":"",
-    #                              "key_id":"",
-    #                              "ip":""}
-    #             }
-    # auth = {"auth":{"ssh_private_key":""}}
-    # base_config.update(node_config)
-    # base_config.update(auth)
-
-
     obj = DeleteResources(base_config)
-
-    # if 'ip' in resources:
-    #     pass
-    # if 'key_id' in resources:
-    #     pass
-    # if 'vsi_id' in resources:
-    #     pass
-    # if 'vpc_id' in resources:
-    #     pass
-    # if 'ssh_private_key' in resources:
-    #     pass
-    # if 'subnet_id' in resources:
-    #     pass
+    
+if __name__ == "__main__":
+    clean_up()

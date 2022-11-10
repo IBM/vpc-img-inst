@@ -3,11 +3,9 @@ import subprocess
 from typing import Any, Dict
 from pathlib import Path
 from utils import store_output
-
-import inquirer
 from inquirer import errors
 from config_builder import ConfigBuilder, spinner
-from utils import Color, color_msg, get_unique_file_name, get_unique_name,logger
+from utils import Color, color_msg, get_unique_file_name,logger, append_random_suffix
 from ibm_cloud_sdk_core import ApiException
 DEFAULT_KEY_NAME = 'temp'
         
@@ -34,11 +32,11 @@ def get_ssh_key(ibm_vpc_client, name):
         if key['name'] == name:
             return key
                     
-def register_ssh_key(ibm_vpc_client, config, ssh_key_objects):
+def register_ssh_key(ibm_vpc_client, config):
     """Returns the key's name on the VPC platform, it's public key's contents and the local path to it.
         Registers an either existing or newly generated ssh-key to a specific VPC. """
     resource_group_id = config['node_config']['resource_group_id']
-    unique_key_name = get_unique_name(name = DEFAULT_KEY_NAME, name_list = ssh_key_objects)
+    unique_key_name = append_random_suffix(base_name=DEFAULT_KEY_NAME)
     ssh_key_data, ssh_key_path = generate_keypair()
 
     response = None
@@ -80,9 +78,7 @@ class SshKeyConfig(ConfigBuilder):
         return [key['name'] for key in self.ibm_vpc_client.list_keys().get_result()['keys']]
 
     def run(self) -> Dict[str, Any]:
-        ssh_key_name, ssh_key_id, ssh_key_path = register_ssh_key(
-            self.ibm_vpc_client, self.base_config, self.get_ssh_key_names())
-
+        ssh_key_name, ssh_key_id, ssh_key_path = register_ssh_key(self.ibm_vpc_client, self.base_config)
         self.ssh_key_id = ssh_key_id
         self.ssh_key_name = ssh_key_name
 

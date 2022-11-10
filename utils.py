@@ -1,3 +1,4 @@
+import uuid
 import yaml
 import os
 import re
@@ -285,7 +286,7 @@ def verify_paths(input_path, output_path, test=False):
     if not input_path or not _is_valid_input_path(input_path):
         input_path = f'{DIR_PATH}/{template_file}.yaml'
     if not output_path or not _is_valid_output_path(output_path):
-        output_path = get_unique_file_name("created_resources",DIR_PATH)
+        output_path = get_unique_file_name("created_resources",f"{DIR_PATH}{os.sep}logs{os.sep}")
 
     return input_path, output_path
 
@@ -378,3 +379,16 @@ def get_unique_name(name, name_list):
 def store_output(data:dict, config):
     with open(config['output_file'], 'a') as file:
         yaml.dump(data, file, default_flow_style=False)
+
+def append_random_suffix(base_name:str):
+    max_length = 62  # max length allowed for naming ibm resources is 63. separating the random part with a '-' decreases it to 62.    
+    rand = str(uuid.uuid4())
+    if len(base_name) + len(rand) > max_length:
+        return base_name + '-' + rand[:(max_length-len(base_name)-len(rand))]
+    else:
+        return base_name + '-' + rand
+
+def create_logs_folder():
+    log_folder_path = DIR_PATH+os.sep+'logs'
+    if not os.path.exists(log_folder_path):
+        os.makedirs(log_folder_path)

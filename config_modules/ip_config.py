@@ -1,6 +1,6 @@
 from config_builder import ConfigBuilder
 from typing import Any, Dict
-from utils import color_msg, Color, logger, get_unique_name, store_output
+from utils import color_msg, Color, logger, store_output, append_random_suffix
 
 class FloatingIpConfig(ConfigBuilder):
     def __init__(self, base_config: Dict[str, Any]) -> None:
@@ -16,9 +16,8 @@ class FloatingIpConfig(ConfigBuilder):
         return self.base_config
 
     def create_ip(self):
-        floating_ips = self.ibm_vpc_client.list_floating_ips().get_result()['floating_ips']
-        ip_name = get_unique_name(name = "temp-fp", name_list = [fip['name'] for fip in floating_ips])
-
+        ip_name = append_random_suffix(base_name="temp-fp")
+        
         floating_ip_prototype = {}
         floating_ip_prototype["name"] = ip_name
         floating_ip_prototype["zone"] = {"name": self.base_config['zone_name']}

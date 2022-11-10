@@ -1,8 +1,6 @@
 from typing import Any, Dict
-import logging
-import inquirer
-from config_builder import ConfigBuilder, update_decorator, spinner
-from utils import find_default,get_option_from_list,get_region_by_endpoint, CACHE, logger, get_unique_name, store_output
+from config_builder import ConfigBuilder, spinner
+from utils import find_default,get_option_from_list,get_region_by_endpoint, CACHE, logger, append_random_suffix, store_output
 
 class VPCConfig(ConfigBuilder):
 
@@ -189,7 +187,7 @@ class VPCConfig(ConfigBuilder):
             resource_group = {'id': resource_group_id}
 
             # Create a unique VPC name
-            vpc_name = get_unique_name(name = self.vpc_name, name_list = [vpc_obj['name'] for vpc_obj in vpc_objects])
+            vpc_name = append_random_suffix(base_name=self.vpc_name)
             vpc_obj = _create_vpc(vpc_name)
             vpc_id = vpc_obj['id']
 
