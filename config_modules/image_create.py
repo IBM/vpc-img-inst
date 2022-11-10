@@ -1,6 +1,7 @@
 from typing import Any, Dict
 from config_builder import ConfigBuilder, spinner
-from utils import color_msg, Color, logger, get_unique_name, store_output, append_random_suffix
+from utils import color_msg, Color, logger, store_output, append_random_suffix
+from constants import DEFAULTS
 import time
 
 
@@ -8,6 +9,7 @@ class ImageCreate(ConfigBuilder):
 
     def __init__(self, base_config: Dict[str, Any]) -> None:
         super().__init__(base_config)
+        self.retries = DEFAULTS['image_create_retries']
 
     def run(self) -> Dict[str, Any]:
         instance_volume_attachments = self.ibm_vpc_client.list_instance_volume_attachments(self.base_config['node_config']['vsi_id']).get_result()
@@ -19,9 +21,10 @@ class ImageCreate(ConfigBuilder):
         # blocks until instance stopped.
         self.poll_instance_status(self.base_config['node_config']['vsi_id']) 
         logger.debug("Stopping instance.")
-             
-        self.create_image(image_name, self.base_config['node_config']['resource_group_id'], boot_volume_id)
-        return self.base_config
+        if self.retries:
+            self.retries -= 1
+            self.create_image(image_name, self.base_config['node_config']['resource_group_id'], boot_volume_id)
+            return self.base_config
     
     
     def create_image(self, image_name, resource_group_id, boot_volume_id):
@@ -47,6 +50,7 @@ class ImageCreate(ConfigBuilder):
                 return True
             elif image_status in ['failed','unusable','deprecated','deleting']:
                 logger.info(color_msg(f"failed to create image {image_id}. Retrying...", Color.RED))
+                store_output({f"failed_image-{DEFAULTS['image_create_retries']-self.retries}":{'image_id':image_id, 'image_name':image_name}},self.base_config)
                 time.sleep(10)
                 self.run()  # retry
                 return True

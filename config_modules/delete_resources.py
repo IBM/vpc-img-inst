@@ -75,8 +75,13 @@ class DeleteResources(ConfigBuilder):
                     pass
                 else:
                     raise e
-
             logger.info(color_msg('Deleted VPC id: {}'.format(self.base_config["node_config"]['vpc_id']), color=Color.PURPLE))
+
+        # delete failed images
+        failed_images = _get_failed_images(self.base_config['output_file'])
+        for failed_image_id in failed_images:
+            self.ibm_vpc_client.delete_image(failed_image_id)
+
 
     def poll_instance_exists(self,instance_id,instance_name):
         tries = 30 # waits up to 1 min with 2 sec interval
@@ -118,6 +123,7 @@ def clean_up(input_file=None):
     base_config = {'delete_resources':True}
     
     file = input_file if input_file else f"{DIR_PATH}{os.sep}logs{os.sep}created_resources"
+    base_config['output_file'] = file
     with open(file, 'r') as f:
         resources = yaml.safe_load(f)
     
@@ -129,11 +135,28 @@ def clean_up(input_file=None):
                                   "ip_address": resources['ip_address'] if 'ip_address' in resources else '' ,}
                 }
     auth = {"auth":{"ssh_private_key":resources['ssh_private_key'] if 'ssh_private_key' in resources else ''}}
+
     base_config.update({"iam_api_key": resources['iam_api_key']})
     base_config.update(auth)
     base_config.update(node_config)
 
     obj = DeleteResources(base_config)
+
+def _get_failed_images(file):
+    failed_images = []
+
+    if not os.path.isfile(file):
+        logger.error(color_msg("Failed to fetch failed images. Resources file doesn't exist",color=Color.RED))
+        return failed_images
+    else:
+        with open(file, 'r') as f:
+            resources = yaml.safe_load(f)
     
+    for resource_key in resources:
+        if 'failed_image' in resource_key:  # failed images are keys in the format: failed_image_<NUMBER>
+            failed_images.append(resources[resource_key]['image_id'])
+    return failed_images
+
+
 if __name__ == "__main__":
     clean_up()
