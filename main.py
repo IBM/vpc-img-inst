@@ -53,7 +53,7 @@ def builder(iam_api_key, output_file, input_file, version, region, yes, base_ima
     base_config['installation_type'] = installation_type if installation_type else DEFAULTS['installation_type']
     base_config['base_image_name'] = base_image_name if base_image_name else DEFAULTS['base_image_name']
     
-    logger.info(color_msg(f"""\nBase Image Name: {base_config['base_image_name']}\nInstallation Type:{base_config['installation_type']}\nRegion:{base_config['region']}\nImage Creation Retries:{DEFAULTS['image_create_retries']} """, color=Color.YELLOW))
+    logger.info(color_msg(f"""\n\nBase Image Name: {base_config['base_image_name']}\nInstallation Type:{base_config['installation_type']}\nRegion:{base_config['region']}\nImage Creation Retries:{DEFAULTS['image_create_retries']} """, color=Color.YELLOW))
     if not yes:
         confirmation = get_confirmation(f"Proceed?")['answer']
         if not confirmation:
@@ -64,13 +64,13 @@ def builder(iam_api_key, output_file, input_file, version, region, yes, base_ima
         try:
             base_config = next_module.run()
         except Exception as e:
-            logger.critical("Exception:\n",e)
+            logger.critical(f"Exception:\n{e}")
             logger.info(color_msg("Program failed, deleting created resources",color=Color.RED))
             clean_up(output_file)
             sys.exit(1)
         
     
-    logger.info(color_msg(f"\nProgram Concluded.\nCreated resources are logged in {output_file}.\n", color=Color.YELLOW))
+    logger.info(color_msg(f"\n\nProgram Concluded.\nCreated resources are logged in {output_file}.\n", color=Color.YELLOW))
 
 def validate_api_keys(base_config, iam_api_key, compute_iam_endpoint):
     """
