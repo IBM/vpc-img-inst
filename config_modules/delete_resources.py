@@ -24,19 +24,37 @@ class DeleteResources(ConfigBuilder):
         print("---------------------------------------------")
 
         if 'ip_id' in self.base_config['node_config'] and self.base_config['node_config']['ip_id']:
-            self.ibm_vpc_client.delete_floating_ip(self.base_config['node_config']['ip_id'])
+            try:
+                self.ibm_vpc_client.delete_floating_ip(self.base_config['node_config']['ip_id'])
+            except ApiException as e:
+                if e.code == 404:  # resource was already deleted
+                    pass
+                else:
+                    raise e
             logger.info(color_msg(f"""Deleted ip id: {self.base_config['node_config']['ip_id']} of address: {self.base_config['node_config']['ip_address']}""", color=Color.PURPLE))
 
         if 'vsi_id' in self.base_config['node_config'] and self.base_config['node_config']['vsi_id']:    
             instance_data = self.ibm_vpc_client.get_instance(self.base_config['node_config']['vsi_id']).get_result()
         # delete instance
-            self.ibm_vpc_client.delete_instance(instance_data['id'])   
+            try:
+                self.ibm_vpc_client.delete_instance(instance_data['id'])   
+            except ApiException as e:
+                if e.code == 404:  # resource was already deleted
+                    pass
+                else:
+                    raise e            
         # blocking call waiting for instance to delete. 
             res=self.poll_instance_exists(instance_data['id'], instance_data['name'])
 
         # delete subnet
         if 'subnet_id' in self.base_config["node_config"] and self.base_config["node_config"]['subnet_id']:
-            self.ibm_vpc_client.delete_subnet(self.base_config["node_config"]['subnet_id'])
+            try:
+                self.ibm_vpc_client.delete_subnet(self.base_config["node_config"]['subnet_id'])
+            except ApiException as e:
+                if e.code == 404:  # resource was already deleted
+                    pass
+                else:
+                    raise e
             self.poll_subnet_exists(self.base_config["node_config"]['subnet_id'])
 
         # delete ssh key
@@ -53,7 +71,7 @@ class DeleteResources(ConfigBuilder):
             private_key = os.path.expanduser(self.base_config['auth']['ssh_private_key'])
             try:
                 os.remove(private_key)
-                logger.info(color_msg(f'Deleted private_key: {private_key}', color=Color.PURPLE))
+                logger.info(color_msg(f'Deleted private key: {private_key}', color=Color.PURPLE))
             except OSError as e:
                 logger.info(color_msg("Failed to delete {private_key}"),Color.RED)
                 print(e)
@@ -61,7 +79,7 @@ class DeleteResources(ConfigBuilder):
             public_key = private_key+".pub"
             try:
                 os.remove(public_key)
-                logger.info(color_msg(f'Deleted private_key: {public_key}', color=Color.PURPLE))
+                logger.info(color_msg(f'Deleted public key: {public_key}', color=Color.PURPLE))
             except OSError as e:
                 logger.info(color_msg("Failed to delete {public_key}"),Color.RED)
                 print(e)
@@ -80,7 +98,13 @@ class DeleteResources(ConfigBuilder):
         # delete failed images
         failed_images = _get_failed_images(self.base_config['output_file'])
         for failed_image_id in failed_images:
-            self.ibm_vpc_client.delete_image(failed_image_id)
+            try:
+                self.ibm_vpc_client.delete_image(failed_image_id)
+            except ApiException as e:
+                if e.code == 404:  # resource was already deleted
+                    pass
+                else:
+                    raise e            
 
 
     def poll_instance_exists(self,instance_id,instance_name):
@@ -139,8 +163,8 @@ def clean_up(input_file=None):
     base_config.update({"iam_api_key": resources['iam_api_key']})
     base_config.update(auth)
     base_config.update(node_config)
-
-    obj = DeleteResources(base_config)
+    # __init__ of DeleteResources starts the clean-up process when this module is run independently.     
+    obj = DeleteResources(base_config)  
 
 def _get_failed_images(file):
     failed_images = []
@@ -163,6 +187,6 @@ if __name__ == "__main__":
     if len(sys.argv)>1:
         resources_file = sys.argv[1]
     if resources_file and not os.path.exists(os.path.abspath(os.path.expanduser(resources_file))):
-        logger.critical(color_msg("file doesn't exist in path",color=Color.RED))
+        logger.critical(color_msg(f"file {resources_file} doesn't exist in path",color=Color.RED))
         sys.exit(1)
     clean_up(resources_file)
