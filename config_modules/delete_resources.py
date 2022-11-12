@@ -26,80 +26,82 @@ class DeleteResources(ConfigBuilder):
         if 'ip_id' in self.base_config['node_config'] and self.base_config['node_config']['ip_id']:
             try:
                 self.ibm_vpc_client.delete_floating_ip(self.base_config['node_config']['ip_id'])
+                logger.info(color_msg(f"""Deleted ip id: {self.base_config['node_config']['ip_id']} of address: {self.base_config['node_config']['ip_address']}""", color=Color.PURPLE))
             except ApiException as e:
                 if e.code == 404:  # resource was already deleted
-                    pass
+                    logger.info(f"""Floating ip with id: "{self.base_config['node_config']['ip_id']}" of address "{self.base_config['node_config']['ip_address']}" doesn't exist""")
                 else:
                     raise e
-            logger.info(color_msg(f"""Deleted ip id: {self.base_config['node_config']['ip_id']} of address: {self.base_config['node_config']['ip_address']}""", color=Color.PURPLE))
 
         if 'vsi_id' in self.base_config['node_config'] and self.base_config['node_config']['vsi_id']:    
-            instance_data = self.ibm_vpc_client.get_instance(self.base_config['node_config']['vsi_id']).get_result()
+            # instance_data = self.ibm_vpc_client.get_instance(self.base_config['node_config']['vsi_id']).get_result()
         # delete instance
             try:
-                self.ibm_vpc_client.delete_instance(instance_data['id'])   
+                self.ibm_vpc_client.delete_instance(self.base_config['node_config']['vsi_id'])  
+                # blocking call waiting for instance to delete. 
+                res=self.poll_instance_exists(self.base_config['node_config']['vsi_id']) 
             except ApiException as e:
                 if e.code == 404:  # resource was already deleted
-                    pass
+                    logger.info(f"""VSI with id: "{self.base_config['node_config']['vsi_id']}" doesn't exist""")
                 else:
                     raise e            
-        # blocking call waiting for instance to delete. 
-            res=self.poll_instance_exists(instance_data['id'], instance_data['name'])
+        
 
         # delete subnet
         if 'subnet_id' in self.base_config["node_config"] and self.base_config["node_config"]['subnet_id']:
             try:
                 self.ibm_vpc_client.delete_subnet(self.base_config["node_config"]['subnet_id'])
+                # blocking call waiting for subnet to delete.
+                self.poll_subnet_exists(self.base_config["node_config"]['subnet_id'])
             except ApiException as e:
                 if e.code == 404:  # resource was already deleted
-                    pass
+                    logger.info(f"""Subnet with id: "{self.base_config["node_config"]['subnet_id']}" doesn't exist""")
                 else:
                     raise e
-            self.poll_subnet_exists(self.base_config["node_config"]['subnet_id'])
-
+            
         # delete ssh key
         if 'key_id' in self.base_config["node_config"] and self.base_config["node_config"]['key_id']:
             try:
                 self.ibm_vpc_client.delete_key(id=self.base_config["node_config"]['key_id'])
+                logger.info(color_msg(f'Removed SSH key id: {self.base_config["node_config"]["key_id"]} from resource group', color=Color.PURPLE))
             except ApiException as e:
                 if e.code == 404:
-                    pass
+                    logger.info(f"""SSH key with id: "{self.base_config["node_config"]["key_id"]}" doesn't exist""")
                 else:
                     raise e
-            logger.info(color_msg(f'Removed SSH key id: {self.base_config["node_config"]["key_id"]} from resource group', color=Color.PURPLE))
+            
         if 'ssh_private_key' in self.base_config['auth'] and self.base_config['auth']['ssh_private_key']:
             private_key = os.path.expanduser(self.base_config['auth']['ssh_private_key'])
             try:
                 os.remove(private_key)
                 logger.info(color_msg(f'Deleted private key: {private_key}', color=Color.PURPLE))
             except OSError as e:
-                logger.info(color_msg("Failed to delete {private_key}"),Color.RED)
-                print(e)
+                logger.info(f"""Local private key: {private_key} doesn't exist""")
             
             public_key = private_key+".pub"
             try:
                 os.remove(public_key)
                 logger.info(color_msg(f'Deleted public key: {public_key}', color=Color.PURPLE))
             except OSError as e:
-                logger.info(color_msg("Failed to delete {public_key}"),Color.RED)
-                print(e)
+                logger.info(f"""Local public key: {public_key} doesn't exist""")
         
         # delete vpc
         if 'vpc_id' in self.base_config["node_config"] and self.base_config["node_config"]['vpc_id']:
             try:
                 self.ibm_vpc_client.delete_vpc(self.base_config["node_config"]['vpc_id'])
+                logger.info(color_msg('Deleted VPC with id: {}'.format(self.base_config["node_config"]['vpc_id']), color=Color.PURPLE))
             except ApiException as e:
                 if e.code == 404:
-                    pass
+                    logger.info(f"""VPC with id: "{self.base_config["node_config"]['vpc_id']}" doesn't exist""")
                 else:
                     raise e
-            logger.info(color_msg('Deleted VPC id: {}'.format(self.base_config["node_config"]['vpc_id']), color=Color.PURPLE))
 
         # delete failed images
         failed_images = _get_failed_images(self.base_config['output_file'])
         for failed_image_id in failed_images:
             try:
                 self.ibm_vpc_client.delete_image(failed_image_id)
+                logger.info(color_msg('Deleted failed image with id: {}'.format(failed_image_id), color=Color.PURPLE))
             except ApiException as e:
                 if e.code == 404:  # resource was already deleted
                     pass
@@ -107,15 +109,15 @@ class DeleteResources(ConfigBuilder):
                     raise e            
 
 
-    def poll_instance_exists(self,instance_id,instance_name):
+    def poll_instance_exists(self,instance_id):
         tries = 30 # waits up to 1 min with 2 sec interval
         sleep_interval = 2
         msg = ""
         while tries:
             try:
                 instance_data = self.ibm_vpc_client.get_instance(instance_id).result
-            except:
-                logger.info(color_msg('Deleted VM instance named: {} with id: {}'.format(instance_name, instance_id), color=Color.PURPLE))
+            except Exception:
+                logger.info(color_msg('Deleted VM instance with id: {}'.format(instance_id), color=Color.PURPLE))
                 return True
             
             #print("Retrying... current status:", instance_data['status'])
@@ -132,7 +134,7 @@ class DeleteResources(ConfigBuilder):
             try:
                 subnet_data = self.ibm_vpc_client.get_instance(subnet_id).result
                 print(subnet_data)
-            except:
+            except Exception:
                 logger.info(color_msg('Deleted subnet id: {}'.format(self.base_config["node_config"]['subnet_id']), color=Color.PURPLE))
                 return True
             
@@ -146,7 +148,7 @@ class DeleteResources(ConfigBuilder):
 def clean_up(input_file=None):
     base_config = {'delete_resources':True}
     
-    file = input_file if input_file else f"{DIR_PATH}{os.sep}logs{os.sep}created_resources"
+    file = input_file if input_file else f"{DIR_PATH}{os.sep}logs{os.sep}created_resources-11"
     base_config['output_file'] = file
     with open(file, 'r') as f:
         resources = yaml.safe_load(f)
