@@ -1,6 +1,6 @@
 from typing import Any, Dict
 from config_builder import ConfigBuilder, spinner
-from utils import find_default,get_option_from_list,get_region_by_endpoint, CACHE, logger, append_random_suffix, store_output
+from utils import find_default,get_option_from_list,get_region_by_endpoint, CACHE, logger, append_random_suffix, store_output, color_msg, Color
 
 class VPCConfig(ConfigBuilder):
 
@@ -105,9 +105,7 @@ class VPCConfig(ConfigBuilder):
         subnet_data = ibm_vpc_client.create_subnet(
             subnet_prototype).result
         subnet_id = subnet_data['id']
-
-        print(
-            f"\033[92mCreated VPC subnet: {subnet_prototype['name']} with id: {subnet_id} \033[0m")
+        logger.info(color_msg(f"Created subnet: {subnet_prototype['name']} with id: {subnet_id}",color=Color.LIGHTGREEN))
 
         # Update security group to have all required rules
         sg_id = vpc_obj['default_security_group']['id']
@@ -191,7 +189,7 @@ class VPCConfig(ConfigBuilder):
             vpc_obj = _create_vpc(vpc_name)
             vpc_id = vpc_obj['id']
 
-            print(f"\n\n\033[92mCreated VPC: {vpc_name} with id: {vpc_id}\033[0m")
+            logger.info(color_msg(f"Created VPC: {vpc_name} with id: {vpc_id}",color=Color.LIGHTGREEN))
 
             self._create_vpc_peripherals(ibm_vpc_client, vpc_obj, zone_obj, resource_group)
             break

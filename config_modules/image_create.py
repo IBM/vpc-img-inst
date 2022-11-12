@@ -16,11 +16,12 @@ class ImageCreate(ConfigBuilder):
         boot_volume_id = instance_volume_attachments['volume_attachments'][0]['volume']['id']
         default_image_name = "cuda-" + self.base_config['node_config']['image_name'] 
         image_name = append_random_suffix(base_name=default_image_name)
-
+        
+        logger.info("Stopping VM instance...")
         self.ibm_vpc_client.create_instance_action(self.base_config['node_config']['vsi_id'], "stop")
         # blocks until instance stopped.
         self.poll_instance_status(self.base_config['node_config']['vsi_id']) 
-        logger.debug("Stopping instance.")
+        
         if self.retries:
             self.retries -= 1
             self.create_image(image_name, self.base_config['node_config']['resource_group_id'], boot_volume_id)
@@ -35,6 +36,7 @@ class ImageCreate(ConfigBuilder):
         logger.info(color_msg(f"""Creating image: "{image_name}" with id: "{image_data['id']}". Process may take a while. """, Color.YELLOW))
   
         self.base_config['new_image_id'] = image_data['id']
+        # blocking call that forces the program to wait for the creation of the image.  
         response = self.poll_image_status(image_data['id'],image_name)
 
     @spinner
@@ -55,7 +57,6 @@ class ImageCreate(ConfigBuilder):
                 self.run()  # retry
                 return True
             else:
-                # print(msg + ". Retrying..." if tries > 0 else msg)
                 tries -= 1
                 time.sleep(sleep_interval)
         logger.info(color_msg(f"Failed to create image {image_id} within the expected time frame of {tries*sleep_interval/60} minutes.\n", Color.RED))
