@@ -50,7 +50,7 @@ class CudaInstall(ConfigBuilder):
             sys.exit(1)
 
         # file_to_execute = 'test.sh'
-        file_to_execute=INST_FILES[self.base_config['installation_type']]
+        file_to_execute = f"installation_scripts/cuda/install_cuda_{self.base_config['installation_type'].lower()}.sh"
         destination = "/tmp"
 
         # Connect to remote host

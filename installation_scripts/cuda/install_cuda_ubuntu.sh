@@ -1,4 +1,5 @@
 #!/bin/bash
+#Ubuntu 20.04 CUDA 
 apt-get install linux-headers-$(uname -r) gcc -y 
 apt-key del 7fa2af80
 export distro="ubuntu2004"
@@ -12,7 +13,7 @@ systemctl enable nvidia-persistenced
 file="/etc/profile.d/cuda-exports.sh"
 cat<<EOF > $file
 export PATH=/usr/local/cuda/bin${PATH:+:${PATH}}
-export CUDA_HOME=/usr/local/cuda" 
+export CUDA_HOME=/usr/local/cuda
 EOF 
 
 
