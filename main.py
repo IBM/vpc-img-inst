@@ -12,17 +12,17 @@ from constants import DEFAULTS
 
 import click
 @click.command()
-@click.option('--output-file', '-o', help='Log of resources created by this program')
-@click.option('--input-file', '-i', help=f'Template for the new configuration')
+@click.option('--output-folder', '-o', show_default=True, default=DEFAULTS['output_folder'], help='Path to folder storing IDs of resources created by this program and installation logs')
+@click.option('--input-file', '-i',show_default=True, default=DEFAULTS['input_file'], help=f'Template for the new configuration')
 @click.option('--iam-api-key', '-a', help='IAM_API_KEY')
 @click.option('--version', '-v', help=f'Get package version', is_flag=True)
-@click.option('--region', help='IBM Cloud region, e.g: us-south, us-east, eu-de, eu-gb')
-@click.option('--yes','-y',is_flag=True, help='Skips confirmation requests')
-@click.option('--base-image-name','-im', help='Base image name')
-@click.option('--installation-type','-it', help='type of CUDA installation to use, e.g. Ubuntu, Fedora, RHEL')
+@click.option('--region','-r', show_default=True, default=DEFAULTS['region'], help='IBM Cloud region, e.g: us-south, us-east, eu-de, eu-gb.')
+@click.option('--yes','-y',show_default=True, is_flag=True, help='Skips confirmation requests')
+@click.option('--base-image-name','-im', show_default=True, default=DEFAULTS['base_image_name'], help='Prefix of image names from your account, on which the produced image will be based')
+@click.option('--installation-type','-it',show_default=True, default=DEFAULTS['installation_type'], help='type of CUDA installation to use, e.g. Ubuntu, Fedora, RHEL.')
 @click.option('--compute-iam-endpoint', help='IAM endpoint url used for compute instead of default https://iam.cloud.ibm.com')
-def builder(iam_api_key, output_file, input_file, version, region, yes, base_image_name, installation_type, compute_iam_endpoint):
-    create_logs_folder()
+def builder(iam_api_key, output_folder, input_file, version, region, yes, base_image_name, installation_type, compute_iam_endpoint):
+    create_logs_folder(output_folder)
 
     # print(color_msg("DEBUGGING - API KEY HARDCODED", color=Color.RED))
     # iam_api_key = os.environ["RESEARCH"]
@@ -31,19 +31,19 @@ def builder(iam_api_key, output_file, input_file, version, region, yes, base_ima
     test = False # affecting verify_paths()
 
     if version:
-        print(f"{pkg_resources.get_distribution('').project_name} "
+        print(f"{pkg_resources.get_distribution('').project_name}"
               f"{pkg_resources.get_distribution('').version}")
         exit(0)
 
     logger.info((color_msg("Welcome to IBM VPC Image CUDA Installer", color=Color.YELLOW)))
 
-
     # if input_file is empty, path to defaults.py is returned.
-    input_file, output_file = verify_paths(input_file, output_file, test=test)
+    input_file, output_file = verify_paths(input_file, output_folder, test=test)
     
     with open(input_file) as f:
         base_config = yaml.safe_load(f)
     
+    base_config['output_folder'] = output_file[:output_file.rfind(os.sep)+1]
     base_config['output_file'] = output_file
 
     base_config, modules = validate_api_keys(base_config, iam_api_key, compute_iam_endpoint)
