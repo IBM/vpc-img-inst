@@ -14,7 +14,7 @@ file="/etc/profile.d/cuda-exports.sh"
 cat<<EOF > $file
 export PATH=/usr/local/cuda/bin${PATH:+:${PATH}}
 export CUDA_HOME=/usr/local/cuda
-EOF 
+EOF
 
 
 
