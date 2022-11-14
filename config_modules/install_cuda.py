@@ -18,8 +18,8 @@ class CudaInstall(ConfigBuilder):
         def _run_remote_script():
             install_log = get_unique_file_name("installation_log", DIR_PATH+os.sep+'logs')
             logger.info(color_msg(f"\nInstalling Cuda in newly created VSI.\n- See logs at {install_log}. Process might take a while.", color=Color.YELLOW))
-            stdout = client.exec_command(f'chmod 777 {destination}/{file_to_execute}')[1] # returns the tuple (stdin,stdout,stderr)
-            stdout = client.exec_command(f'{destination}/{file_to_execute}')[1]
+            stdout = client.exec_command(f'chmod 777 {remote_destination}/{script_name}')[1] # returns the tuple (stdin,stdout,stderr)
+            stdout = client.exec_command(f'{remote_destination}/{script_name}')[1]
             
             with open(install_log, "a") as f:
                 for line in stdout:
@@ -50,8 +50,9 @@ class CudaInstall(ConfigBuilder):
             sys.exit(1)
 
         # file_to_execute = 'test.sh'
-        file_to_execute = f"installation_scripts/cuda/install_cuda_{self.base_config['installation_type'].lower()}.sh"
-        destination = "/tmp"
+        file_to_execute = f"installation_scripts{os.sep}cuda{os.sep}install_cuda_{self.base_config['installation_type'].lower()}.sh"
+        script_name = file_to_execute.split(os.sep)[-1]
+        remote_destination = "/tmp"
 
         # Connect to remote host
         key_obj = paramiko.RSAKey.from_private_key_file(self.base_config['auth']['ssh_private_key'])
@@ -61,7 +62,7 @@ class CudaInstall(ConfigBuilder):
 
         # Setup sftp connection and transmit script
         sftp = client.open_sftp()
-        sftp.put(f'{DIR_PATH}/{file_to_execute}',f"{destination}/{file_to_execute}")
+        sftp.put(f'{DIR_PATH}{os.sep}{file_to_execute}',f"{remote_destination}/{script_name}")
         sftp.close()
         _run_remote_script()
 
