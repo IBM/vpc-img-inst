@@ -4,9 +4,11 @@ import time
 import yaml
 import sys
 from typing import Any, Dict
+
+from constants import DEFAULTS
 sys.path.append('../generate_gpu_image')
-from config_builder import ConfigBuilder, spinner
-from utils import color_msg, Color, logger, DIR_PATH
+from config_builder import ConfigBuilder
+from utils import color_msg, Color, logger
 from ibm_cloud_sdk_core import ApiException
 
 class DeleteResources(ConfigBuilder):
@@ -145,10 +147,10 @@ class DeleteResources(ConfigBuilder):
         return False
 
 
-def clean_up(input_file=None):
+def clean_up(output_file=None):
     base_config = {'delete_resources':True}
     
-    file = input_file if input_file else f"{DIR_PATH}{os.sep}logs{os.sep}created_resources-11"
+    file = output_file if output_file else f"{DEFAULTS['output_folder']}created_resources"
     base_config['output_file'] = file
     with open(file, 'r') as f:
         resources = yaml.safe_load(f)
@@ -166,7 +168,7 @@ def clean_up(input_file=None):
     base_config.update(auth)
     base_config.update(node_config)
     # __init__ of DeleteResources starts the clean-up process when this module is run independently.     
-    obj = DeleteResources(base_config)  
+    DeleteResources(base_config)  
 
 def _get_failed_images(file):
     failed_images = []

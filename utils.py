@@ -14,9 +14,10 @@ from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 import ibm_cloud_sdk_core
 import logging
 
+from constants import DEFAULTS
+
 logging.basicConfig(level = logging.INFO,  format='%(asctime)s %(levelname)-8s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger()
-DIR_PATH = os.path.dirname(os.path.realpath(__file__))  # absolute path to project's root folder.
 ARG_STATUS = Enum('STATUS', 'VALID INVALID MISSING')  # variable possible status.
 CACHE = {}
 class MSG_STATUS(Enum):
@@ -275,20 +276,22 @@ def verify_paths(input_path, output_path, test=False):
 
     def _is_valid_output_path(path):
         """:returns path if it's either a valid absolute path, or a file name to be appended to current directory"""
-        dir_file = path.rsplit('/', 1)
+        dir_file = path.rsplit(os.sep, 1)
         prefix_directory = dir_file[0]
         if len(dir_file) == 1 or os.path.isdir(prefix_directory):
             return path
         else:
             print(color_msg(f"{prefix_directory} doesn't lead to an existing directory", color=Color.RED))
 
-    template_file = "TEST/TEST" if test else "defaults"
+    # template_file = "TEST/TEST" if test else "defaults"
     if not input_path or not _is_valid_input_path(input_path):
-        input_path = f'{DIR_PATH}/{template_file}.yaml'
+        input_path = DEFAULTS['input_file']
     if not output_path or not _is_valid_output_path(output_path):
-        output_path = get_unique_file_name("created_resources",f"{DIR_PATH}{os.sep}logs{os.sep}")
+        output_file = get_unique_file_name("created_resources",DEFAULTS['output_folder'])
+    else:
+        output_file = get_unique_file_name("created_resources",output_path)
 
-    return input_path, output_path
+    return input_path, output_file
 
 
 def verify_iam_api_key(answers, apikey, iam_endpoint=None):
@@ -388,7 +391,6 @@ def append_random_suffix(base_name:str):
     else:
         return base_name + '-' + rand
 
-def create_logs_folder():
-    log_folder_path = DIR_PATH+os.sep+'logs'
+def create_logs_folder(log_folder_path):
     if not os.path.exists(log_folder_path):
         os.makedirs(log_folder_path)

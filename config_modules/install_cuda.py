@@ -1,13 +1,11 @@
 from config_builder import ConfigBuilder, spinner
 from typing import Any, Dict
-from utils import DIR_PATH
 import paramiko
 import time
 import sys
 import os
-from utils import color_msg, Color, logger, DIR_PATH, get_unique_file_name
-
-INST_FILES = {"Ubuntu":"install_cuda_ubuntu.sh"}
+from utils import color_msg, Color, logger, get_unique_file_name
+from constants import DIR_PATH
 
 class CudaInstall(ConfigBuilder):
     def __init__(self, base_config: Dict[str, Any]) -> None:
@@ -16,8 +14,8 @@ class CudaInstall(ConfigBuilder):
     def run(self) -> Dict[str, Any]:
         @spinner
         def _run_remote_script():
-            install_log = get_unique_file_name("installation_log", DIR_PATH+os.sep+'logs')
-            logger.info(color_msg(f"\nInstalling Cuda in newly created VSI.\n- See logs at {install_log}. Process might take a while.", color=Color.YELLOW))
+            install_log = get_unique_file_name("installation_log", self.base_config['output_folder'])
+            logger.info(color_msg(f"\nInstalling CUDA in newly created VSI.\n- See logs at {install_log}. Process might take a while.", color=Color.YELLOW))
             stdout = client.exec_command(f'chmod 777 {remote_destination}/{script_name}')[1] # returns the tuple (stdin,stdout,stderr)
             stdout = client.exec_command(f'{remote_destination}/{script_name}')[1]
             
@@ -28,7 +26,7 @@ class CudaInstall(ConfigBuilder):
             # Blocking call
             exit_status = stdout.channel.recv_exit_status()          
             if exit_status == 0:
-                logger.info(color_msg("Cuda installation script executed successfully.",color=Color.GREEN))
+                logger.info(color_msg("CUDA installation script executed successfully.",color=Color.GREEN))
             else:
                 logger.info(color_msg("Error executing script",color=Color.RED))
 
