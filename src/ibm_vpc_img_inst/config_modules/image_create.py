@@ -1,7 +1,7 @@
 from typing import Any, Dict
-from config_builder import ConfigBuilder, spinner
-from utils import color_msg, Color, logger, store_output, append_random_suffix
-from constants import DEFAULTS
+from ibm_vpc_img_inst.config_builder import ConfigBuilder, spinner
+from ibm_vpc_img_inst.utils import color_msg, Color, logger, store_output, append_random_suffix
+from ibm_vpc_img_inst.constants import DEFAULTS
 import time
 
 

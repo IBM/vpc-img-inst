@@ -1,20 +1,19 @@
-import uuid
-import yaml
+import logging
 import os
 import re
 import subprocess
 import sys
-import tempfile
 import time
+import uuid
 from enum import Enum
-import inquirer
-from inquirer import errors
-from ibm_platform_services import IamIdentityV1
-from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
-import ibm_cloud_sdk_core
-import logging
 
-from constants import DEFAULTS
+import ibm_cloud_sdk_core
+import inquirer
+import yaml
+from ibm_vpc_img_inst.constants import DEFAULTS
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+from ibm_platform_services import IamIdentityV1
+from inquirer import errors
 
 logging.basicConfig(level = logging.INFO,  format='%(asctime)s %(levelname)-8s %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger()

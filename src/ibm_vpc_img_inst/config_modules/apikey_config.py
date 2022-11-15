@@ -1,7 +1,7 @@
 
 from typing import Any, Dict
-from config_builder import ConfigBuilder, update_decorator
-from utils import password_dialog, color_msg, Color, verify_iam_api_key, store_output
+from ibm_vpc_img_inst.config_builder import ConfigBuilder, update_decorator
+from ibm_vpc_img_inst.utils import password_dialog, color_msg, Color, verify_iam_api_key, store_output
 
 class ApiKeyConfig(ConfigBuilder):
 

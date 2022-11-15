@@ -1,4 +1,3 @@
-
 import os
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))  # absolute path to project's root folder.
 DEFAULTS = {'base_image_name':'ibm-ubuntu-20-04-4-minimal-amd64-2',  

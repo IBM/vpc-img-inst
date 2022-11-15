@@ -1,16 +1,19 @@
-import pkg_resources
 import os
 import sys
+
 import click
+import pkg_resources
 import yaml
-import config_modules
-from utils import color_msg, Color, verify_paths, get_confirmation, create_logs_folder, logger
-from config_modules.delete_resources import clean_up
-from constants import DEFAULTS
+from ibm_vpc_img_inst import config_modules
+from ibm_vpc_img_inst.config_modules.delete_resources import clean_up
+from ibm_vpc_img_inst.constants import DEFAULTS
+
+from ibm_vpc_img_inst.utils import (Color, color_msg, create_logs_folder,
+                                    get_confirmation, logger, verify_paths)
+
 # default values for the vsi on which the produced image will base upon  
 
 
-import click
 @click.command()
 @click.option('--output-folder', '-o', show_default=True, default=DEFAULTS['output_folder'], help='Path to folder storing IDs of resources created by this program and installation logs')
 @click.option('--input-file', '-i',show_default=True, default=DEFAULTS['input_file'], help=f'Template for the new configuration')

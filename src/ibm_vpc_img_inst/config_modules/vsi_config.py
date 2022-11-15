@@ -1,6 +1,6 @@
 from typing import Any, Dict
-from config_builder import ConfigBuilder
-from utils import color_msg, Color, logger, store_output, append_random_suffix
+from ibm_vpc_img_inst.config_builder import ConfigBuilder
+from ibm_vpc_img_inst.utils import color_msg, Color, logger, store_output, append_random_suffix
 from ibm_cloud_sdk_core import ApiException
 
 class VSIConfig(ConfigBuilder):

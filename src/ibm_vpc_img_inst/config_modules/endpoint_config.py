@@ -1,7 +1,7 @@
 import logging
-from config_builder import ConfigBuilder, update_decorator, spinner
+from ibm_vpc_img_inst.config_builder import ConfigBuilder, update_decorator, spinner
 from typing import Any, Dict
-from utils import logger
+from ibm_vpc_img_inst.utils import logger
 
 
 class EndpointConfig(ConfigBuilder):

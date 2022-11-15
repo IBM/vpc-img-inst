@@ -1,13 +1,15 @@
 import logging
+import sys
+import threading
+import time
 from typing import Any, Dict
+
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from ibm_platform_services import ResourceControllerV2, ResourceManagerV2
 from ibm_vpc import VpcV1
 from ibm_watson import IAMTokenManager
-import threading
-import time
-import sys
-from utils import CACHE, find_default, get_option_from_list
+
+from ibm_vpc_img_inst.utils import CACHE, find_default, get_option_from_list
 
 logger = logging.getLogger(__name__)
 

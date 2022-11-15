@@ -1,6 +1,6 @@
 from typing import Any, Dict
-from config_builder import ConfigBuilder, spinner
-from utils import find_default,get_option_from_list,get_region_by_endpoint, CACHE, logger, append_random_suffix, store_output, color_msg, Color
+from ibm_vpc_img_inst.config_builder import ConfigBuilder, spinner
+from ibm_vpc_img_inst.utils import find_default,get_option_from_list,get_region_by_endpoint, CACHE, logger, append_random_suffix, store_output, color_msg, Color
 
 class VPCConfig(ConfigBuilder):
 

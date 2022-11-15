@@ -1,11 +1,11 @@
-from config_builder import ConfigBuilder, spinner
+from ibm_vpc_img_inst.config_builder import ConfigBuilder, spinner
 from typing import Any, Dict
 import paramiko
 import time
 import sys
 import os
-from utils import color_msg, Color, logger, get_unique_file_name
-from constants import DIR_PATH
+from ibm_vpc_img_inst.utils import color_msg, Color, logger, get_unique_file_name
+from ibm_vpc_img_inst.constants import DIR_PATH
 
 class CudaInstall(ConfigBuilder):
     def __init__(self, base_config: Dict[str, Any]) -> None:
