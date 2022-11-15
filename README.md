@@ -33,7 +33,7 @@ Get a short description of the available flags via ```ibm-vpc-img-inst --help```
  | iam-api-key   | |yes|IBM Cloud API key. To generate a new API Key adhere to the following [guide](https://www.ibm.com/docs/en/spectrumvirtualizecl/8.1.3?topic=installing-creating-api-key)
  | input-file    |<project_root_folder>/defaults.py| no | Existing config file to be used as a template in the configuration process |
  | output-folder   |<project_root_folder>/logs/ | no |Path to folder storing IDs of resources created by this program and installation logs |
- | version       | | no |Returns ibm-ray-config's package version|
+ | version       | | no |Returns ibm-vpc-img-inst's package version|
  |region| us-south| no|Geographical location for deployment and scope for available resources by the IBM-VPC service. Regions are listed <a href="https://cloud.ibm.com/docs/vpc?topic=vpc-creating-a-vpc-in-a-different-region&interface=cli"> here</a>. |
  |base-image-name| ibm-ubuntu-20-04-4-minimal-amd64-2| no| Prefix of an image name from your account, on which the produced image will be based. Could be either an IBM stock image as explained [here](https://cloud.ibm.com/docs/vpc?topic=vpc-about-images) or a custom image.|
   | installation-type| Ubuntu | no |Type of CUDA installation to use, e.g. Ubuntu, Fedora, RHEL.|
