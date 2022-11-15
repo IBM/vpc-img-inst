@@ -6,11 +6,12 @@ import sys
 import time
 import uuid
 from enum import Enum
+from os.path import isfile, join
 
 import ibm_cloud_sdk_core
 import inquirer
 import yaml
-from ibm_vpc_img_inst.constants import DEFAULTS
+from ibm_vpc_img_inst.constants import DEFAULTS, DIR_PATH
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from ibm_platform_services import IamIdentityV1
 from inquirer import errors
@@ -263,7 +264,7 @@ def run_cmd(cmd):
     process.stdout.close()
     process.wait()
 
-def verify_paths(input_path, output_path, test=False):
+def verify_paths(input_path, output_path):
     """:returns a valid input and output path files, in accordance with provided paths.
         if a given path is invalid, and user is unable to rectify, a default path will be chosen in its stead. """
 
@@ -282,7 +283,6 @@ def verify_paths(input_path, output_path, test=False):
         else:
             print(color_msg(f"{prefix_directory} doesn't lead to an existing directory", color=Color.RED))
 
-    # template_file = "TEST/TEST" if test else "defaults"
     if not input_path or not _is_valid_input_path(input_path):
         input_path = DEFAULTS['input_file']
     if not output_path or not _is_valid_output_path(output_path):
@@ -363,10 +363,9 @@ class Background(Enum):
 
 def get_unique_file_name(name, path):
     """returns the path to a file holding a unique name within the specified path"""
-    from os.path import isfile, join
     if path[-1] != os.sep:
         path += os.sep
-    files = [f for f in os.listdir(path) if isfile(join(path, f))]
+    files = [f for f in os.listdir(path) if isfile(join(path, f))] # files in directory
 
     return path + get_unique_name(name, files)
 
@@ -393,3 +392,13 @@ def append_random_suffix(base_name:str):
 def create_logs_folder(log_folder_path):
     if not os.path.exists(log_folder_path):
         os.makedirs(log_folder_path)
+
+def get_supported_features():
+    path = DIR_PATH+os.sep+"installation_scripts"
+    return next(os.walk(path))[1]
+
+def get_installation_types_for_feature(feature):
+    path = DIR_PATH+os.sep+"installation_scripts"+os.sep+feature
+    files = [f for f in os.listdir(path) if isfile(join(path, f))]
+    inst_types = [file[file.rfind('_')+1:file.rfind('.')] for file in files]
+    return inst_types

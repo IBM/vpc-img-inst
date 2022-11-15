@@ -36,6 +36,7 @@ Get a short description of the available flags via ```ibm-vpc-img-inst --help```
  | version       | | no |Returns ibm-vpc-img-inst's package version|
  |region| us-south| no|Geographical location for deployment and scope for available resources by the IBM-VPC service. Regions are listed <a href="https://cloud.ibm.com/docs/vpc?topic=vpc-creating-a-vpc-in-a-different-region&interface=cli"> here</a>. |
  |base-image-name| ibm-ubuntu-20-04-4-minimal-amd64-2| no| Prefix of an image name from your account, on which the produced image will be based. Could be either an IBM stock image as explained [here](https://cloud.ibm.com/docs/vpc?topic=vpc-about-images) or a custom image.|
-  | installation-type| Ubuntu | no |Type of CUDA installation to use, e.g. Ubuntu, Fedora, RHEL.|
+  | installation-type| Ubuntu | no |type of installation to use, e.g. for feature CUDA the currently supported types are: Ubuntu and RHEL.|
+  | feature| CUDA | no |Feature to install on the produced image, e.g: CUDA.|
  compute_iam_endpoint|https://iam.cloud.ibm.com|no|Alternative IAM endpoint url for the cloud provider, e.g. https://iam.test.cloud.ibm.com|
 
