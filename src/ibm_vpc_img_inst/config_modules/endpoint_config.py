@@ -1,7 +1,7 @@
-import logging
+import sys
 from ibm_vpc_img_inst.config_builder import ConfigBuilder, update_decorator, spinner
 from typing import Any, Dict
-from ibm_vpc_img_inst.utils import logger
+from ibm_vpc_img_inst.utils import logger,color_msg,Color
 
 
 class EndpointConfig(ConfigBuilder):
@@ -18,7 +18,8 @@ class EndpointConfig(ConfigBuilder):
         regions_objects = self._get_regions_objects()
         region_obj = next((r for r in regions_objects if r['name'] == self.base_config['region']), None)
         if not region_obj:
-            raise Exception("Invalid region")
+             logger.critical(color_msg(f"Region Chosen: {self.region} is invalid ",color=Color.RED))
+             raise Exception("Invalid argument")
         ConfigBuilder.ibm_vpc_client.set_service_url(region_obj['endpoint'] + '/v1')   # update global ibm_vpc_client to selected endpoint
         ConfigBuilder.region = region_obj['name']
         
