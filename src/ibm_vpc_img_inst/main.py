@@ -34,8 +34,8 @@ def builder(iam_api_key, output_folder, input_file, version, region, yes, base_i
     test = False # affecting verify_paths()
 
     if version:
-        print(f"{pkg_resources.get_distribution('').project_name}"
-              f"{pkg_resources.get_distribution('').version}")
+        print(f"{pkg_resources.get_distribution('ibm-vpc-img-inst').project_name}"
+              f"{pkg_resources.get_distribution('ibm-vpc-img-inst').version}")
         exit(0)
 
     logger.info((color_msg("Welcome to IBM VPC Image CUDA Installer", color=Color.YELLOW)))
