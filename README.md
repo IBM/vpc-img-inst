@@ -11,11 +11,9 @@ Mostly tested with Fedora 35 and Ubuntu 20, but should work with most Linux syst
     ```
     sudo apt install openssh-client
     ```
-- requirements.txt installed: 
-    ```
-    pip install -r requirements.txt
-    ```
-
+- Install the package **locally** using pip:  
+    run `pip install .` from the project's root directory.  
+    This requirement is temporary until this program will get clearance and be published in PyPi.
 ## Usage
 Use the configuration tool as follows:
 
