@@ -134,8 +134,7 @@ class DeleteResources(ConfigBuilder):
         msg = ""
         while tries:
             try:
-                subnet_data = self.ibm_vpc_client.get_instance(subnet_id).result
-                print(subnet_data)
+                subnet_data = self.ibm_vpc_client.get_subnet(subnet_id).result
             except Exception:
                 logger.info(color_msg('Deleted subnet id: {}'.format(self.base_config["node_config"]['subnet_id']), color=Color.PURPLE))
                 return True
