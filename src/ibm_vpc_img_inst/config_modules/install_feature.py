@@ -30,7 +30,8 @@ class FeatureInstall(ConfigBuilder):
             if exit_status == 0:
                 logger.info(color_msg("installation script executed successfully.",color=Color.GREEN))
             else:
-                logger.info(color_msg("Error executing script",color=Color.RED))
+                logger.critical(color_msg("Error executing script",color=Color.RED))
+                raise Exception("Script installation failed.")
 
         @spinner
         def connect_to_ssh_port(key_obj):
