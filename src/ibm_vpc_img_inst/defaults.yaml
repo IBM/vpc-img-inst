@@ -10,7 +10,7 @@ zone_name: ""
 iam_api_key: ""
 
 node_config:
-    ip: ""
+    ip_address: ""
     vpc_id: ""
     vsi_id: ""
     resource_group_id: ""

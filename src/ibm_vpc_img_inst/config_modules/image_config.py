@@ -16,9 +16,9 @@ class ImageConfig(ConfigBuilder):
             return self.ibm_vpc_client.list_images().get_result()['images']
             
         image_objects = get_image_objects()
-        image = next((obj for obj in image_objects if obj['name'].startswith(self.base_config['base_image_name'])), None)
+        image = next((img for img in image_objects if img['name'].startswith(self.base_config['user_image_name'])), None)
         if not image:
-            logger.critical(color_msg(f"Base image chosen: {self.base_config['base_image_name']} doesn't exist. ",color=Color.RED))
+            logger.critical(color_msg(f"Base image chosen: {self.base_config['user_image_name']} doesn't exist. ",color=Color.RED))
             raise Exception
         self.base_config['node_config']['image_id'] = image['id']
         self.base_config['node_config']['image_name'] = image['name']

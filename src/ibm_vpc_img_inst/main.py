@@ -12,9 +12,6 @@ from ibm_vpc_img_inst.utils import (Color, color_msg, create_logs_folder,
                                     get_confirmation, logger, verify_paths,
                                     get_installation_types_for_feature,get_supported_features)
 
-# default values for the vsi on which the produced image will base upon  
-
-
 @click.command()
 @click.option('--output-folder', '-o', show_default=True, default=DEFAULTS['output_folder'], help='Path to folder storing IDs of resources created by this program and installation logs')
 @click.option('--input-file', '-i',show_default=True, default=DEFAULTS['input_file'], help=f'Template for the new configuration')
@@ -24,7 +21,7 @@ from ibm_vpc_img_inst.utils import (Color, color_msg, create_logs_folder,
 @click.option('--yes','-y',show_default=True, is_flag=True, help='Skips confirmation requests')
 @click.option('--base-image-name','-im', show_default=True, default=DEFAULTS['base_image_name'], help='Prefix of image names from your account, on which the produced image will be based')
 @click.option('--installation-type','-it',show_default=True, default=DEFAULTS['installation_type'], help='type of installation to use, e.g. for feature CUDA the currently supported types are: Ubuntu and RHEL.')
-@click.option('--feature','-f', show_default=True, default=DEFAULTS['feature'], help='Feature to install on the produced image, e.g: CUDA')
+@click.option('--feature','-f', show_default=True, default=DEFAULTS['feature'], help='Feature to install on the produced image. Currently: CUDA or Docker.')
 @click.option('--compute-iam-endpoint', help='IAM endpoint url used for compute instead of default https://iam.cloud.ibm.com')
 def builder(iam_api_key, output_folder, input_file, version, region, yes, base_image_name, installation_type, feature, compute_iam_endpoint):
     create_logs_folder(output_folder)
@@ -50,10 +47,10 @@ def builder(iam_api_key, output_folder, input_file, version, region, yes, base_i
 
     base_config['region'] =  region.lower() 
     base_config['installation_type'] = installation_type.lower() 
-    base_config['base_image_name'] = base_image_name.lower() 
+    base_config['user_image_name'] = base_image_name.lower() 
     base_config['feature'] = feature.lower() 
 
-    logger.info(color_msg(f"""\n\nBase Image Name: {base_config['base_image_name']}\nFeature: {base_config['feature']}\nInstallation Type: {base_config['installation_type']}\nRegion: {base_config['region']}\nImage Creation Retries: {DEFAULTS['image_create_retries']} """, color=Color.YELLOW))
+    logger.info(color_msg(f"""\n\nBase Image Name: {base_config['user_image_name']}\nFeature: {base_config['feature']}\nInstallation Type: {base_config['installation_type']}\nRegion: {base_config['region']}\nImage Creation Retries: {DEFAULTS['image_create_retries']} """, color=Color.YELLOW))
     if not yes:
         confirmation = get_confirmation(f"Proceed?")['answer']
         if not confirmation:
@@ -96,7 +93,7 @@ def validate_flags(feature,installation_type):
 
     if installation_type not in get_installation_types_for_feature(feature):
         logger.critical(color_msg(f"Installation type Chosen: {installation_type} isn't supported for feature: {feature}",color=Color.RED))
-        raise Exception("Invalid argument.")    
+        raise Exception("Invalid argument.")
 
 
 if __name__ == "__main__":
