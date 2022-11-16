@@ -18,8 +18,11 @@ Mostly tested with Fedora 35 and Ubuntu 20, but should work with most Linux syst
 Use the configuration tool as follows:
 
 ```
-ibm-vpc-img-inst [--iam-api-key IAM_API_KEY] [--region REGION] [-i INPUT_FILE] [-o OUTPUT_FOLDER] [-im BASE_IMAGE_NAME] [-it INSTALLATION_TYPE] [--compute-iam-endpoint IAM_ENDPOINT] [-y] [--version] 
+ibm-vpc-img-inst [--iam-api-key IAM_API_KEY] [--region REGION] [-i INPUT_FILE] [-o OUTPUT_FOLDER] [-f FEATURE] [-im BASE_IMAGE_NAME] [-it INSTALLATION_TYPE] [--compute-iam-endpoint IAM_ENDPOINT] [-y] [--version] 
 ```
+### Examples
+- `ibm-vpc-img-inst -a <API_KEY> -y -f docker -it rhel -im ibm-redhat-8-6`
+- `ibm-vpc-img-inst -a <API_KEY> -y -f cuda -it ubuntu`
 
 Get a short description of the available flags via ```ibm-vpc-img-inst --help```
 
@@ -37,6 +40,6 @@ Get a short description of the available flags via ```ibm-vpc-img-inst --help```
  |region| us-south| no|Geographical location for deployment and scope for available resources by the IBM-VPC service. Regions are listed <a href="https://cloud.ibm.com/docs/vpc?topic=vpc-creating-a-vpc-in-a-different-region&interface=cli"> here</a>. |
  |base-image-name| ibm-ubuntu-20-04-4-minimal-amd64-2| no| Prefix of an image name from your account, on which the produced image will be based. Could be either an IBM stock image as explained [here](https://cloud.ibm.com/docs/vpc?topic=vpc-about-images) or a custom image.|
   | installation-type| Ubuntu | no |type of installation to use, e.g. for feature CUDA the currently supported types are: Ubuntu and RHEL.|
-  | feature| CUDA | no |Feature to install on the produced image, e.g: CUDA.|
+  | feature| CUDA | no |Feature to install on the produced image. Currently supporting: CUDA and Docker.|
  compute_iam_endpoint|https://iam.cloud.ibm.com|no|Alternative IAM endpoint url for the cloud provider, e.g. https://iam.test.cloud.ibm.com|
 
