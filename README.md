@@ -21,8 +21,8 @@ Use the configuration tool as follows:
 ibm-vpc-img-inst [--iam-api-key IAM_API_KEY] [--region REGION] [-i INPUT_FILE] [-o OUTPUT_FOLDER] [-f FEATURE] [-im BASE_IMAGE_NAME] [-it INSTALLATION_TYPE] [--compute-iam-endpoint IAM_ENDPOINT] [-y] [--version] 
 ```
 ### Examples
-- `ibm-vpc-img-inst -a <API_KEY> -y -f docker -it rhel -im ibm-redhat-8-6`
-- `ibm-vpc-img-inst -a <API_KEY> -y -f cuda -it ubuntu`
+- `ibm-vpc-img-inst -a <API_KEY> -y -f cuda -it rhel -im ibm-redhat-8-6`
+- `ibm-vpc-img-inst -a <API_KEY> -y -f docker -it ubuntu` (using default base image)
 
 Get a short description of the available flags via ```ibm-vpc-img-inst --help```
 
