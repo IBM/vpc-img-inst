@@ -18,11 +18,11 @@ class FeatureInstall(ConfigBuilder):
 
         @spinner
         def _run_remote_script():
-            logger.info(color_msg(f"\nInstalling {self.feature} in newly created VSI.\n- See logs at {install_log}. Process might take a while.", color=Color.YELLOW))
-
+            
             while self.inst_retries:  
                 self.inst_retries -= 1          
                 install_log = get_unique_file_name("installation_log", self.base_config['output_folder'])
+                logger.info(color_msg(f"\nInstalling {self.feature} in newly created VSI.\n- See logs at {install_log}. Process might take a while.", color=Color.YELLOW))
 
                 stdout = client.exec_command(f'chmod 777 {remote_destination}/{script_name}')[1] # returns the tuple (stdin,stdout,stderr)
                 stdout = client.exec_command(f'{remote_destination}/{script_name}')[1]
