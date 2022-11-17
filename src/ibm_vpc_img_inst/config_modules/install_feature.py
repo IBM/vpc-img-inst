@@ -4,7 +4,7 @@ import paramiko
 import time
 import sys
 import os
-from ibm_vpc_img_inst.utils import color_msg, Color, logger, get_unique_file_name
+from ibm_vpc_img_inst.utils import color_msg, Color, logger, get_unique_file_name, DEFAULTS
 from ibm_vpc_img_inst.constants import DIR_PATH
 
 class FeatureInstall(ConfigBuilder):
@@ -12,26 +12,34 @@ class FeatureInstall(ConfigBuilder):
         super().__init__(base_config)
         self.feature = self.base_config['feature']
         self.installation_type = self.base_config['installation_type']
+        self.inst_retries = DEFAULTS['script_inst_retries']
 
     def run(self) -> Dict[str, Any]:
+
         @spinner
         def _run_remote_script():
-            install_log = get_unique_file_name("installation_log", self.base_config['output_folder'])
             logger.info(color_msg(f"\nInstalling {self.feature} in newly created VSI.\n- See logs at {install_log}. Process might take a while.", color=Color.YELLOW))
-            stdout = client.exec_command(f'chmod 777 {remote_destination}/{script_name}')[1] # returns the tuple (stdin,stdout,stderr)
-            stdout = client.exec_command(f'{remote_destination}/{script_name}')[1]
-            
-            with open(install_log, "a") as f:
-                for line in stdout:
-                    f.write(line)
 
-            # Blocking call
-            exit_status = stdout.channel.recv_exit_status()          
-            if exit_status == 0:
-                logger.info(color_msg("installation script executed successfully.",color=Color.GREEN))
-            else:
-                logger.critical(color_msg("Error executing script",color=Color.RED))
-                raise Exception("Script installation failed.")
+            while self.inst_retries:  
+                self.inst_retries -= 1          
+                install_log = get_unique_file_name("installation_log", self.base_config['output_folder'])
+
+                stdout = client.exec_command(f'chmod 777 {remote_destination}/{script_name}')[1] # returns the tuple (stdin,stdout,stderr)
+                stdout = client.exec_command(f'{remote_destination}/{script_name}')[1]
+                
+                with open(install_log, "a") as f:
+                    for line in stdout:
+                        f.write(line)
+
+                # Blocking call. returns when script completed/failed
+                exit_status = stdout.channel.recv_exit_status()          
+                if exit_status == 0:
+                    logger.info(color_msg("installation script executed successfully.",color=Color.GREEN))
+                    return True
+                elif self.inst_retries:
+                    logger.critical(color_msg("Error executing script. Retrying...",color=Color.RED))
+
+            raise Exception("Script installation failed. Terminating program.")
 
         @spinner
         def connect_to_ssh_port(key_obj):
@@ -66,7 +74,6 @@ class FeatureInstall(ConfigBuilder):
         sftp.put(f'{DIR_PATH}{os.sep}{file_to_execute}',f"{remote_destination}/{script_name}")
         sftp.close()
         _run_remote_script()
-
         client.close()
 
         return self.base_config
