@@ -37,7 +37,7 @@ class FeatureInstall(ConfigBuilder):
                     logger.info(color_msg("installation script executed successfully.",color=Color.GREEN))
                     return True
                 elif self.inst_retries:
-                    logger.critical(color_msg("Error executing script. Retrying...",color=Color.RED))
+                    logger.error(color_msg("Error executing script. Retrying...",color=Color.RED))
 
             raise Exception("Script installation failed. Terminating program.")
 
