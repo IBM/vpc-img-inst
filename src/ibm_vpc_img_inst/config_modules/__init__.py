@@ -12,5 +12,3 @@ from ibm_vpc_img_inst.config_modules.delete_resources import DeleteResources
 
 MODULES = [ApiKeyConfig, EndpointConfig, VPCConfig, ImageConfig,
             SshKeyConfig, VSIConfig, FloatingIpConfig, FeatureInstall, ImageCreate, DeleteResources]
-# MODULES = [ApiKeyConfig, EndpointConfig, VPCConfig, ImageConfig,
-#             SshKeyConfig, VSIConfig, FloatingIpConfig, ImageCreate, DeleteResources]                            

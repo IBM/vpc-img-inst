@@ -29,6 +29,8 @@ Get a short description of the available flags via ```ibm-vpc-img-inst --help```
 <br/>
 
 ### Flags Detailed Description
+Note - Flags' values are case sensitive.  
+For example `--feature cuda` also represents the folder's name, ergo the program will fail to detect the feature using `--feature CUDA`.     
 
 <!--- <img width=125/> is used in the following table to create spacing --->
  |<span style="color:orange">Key|<span style="color:orange">Default|<span style="color:orange">Mandatory|<span style="color:orange">Additional info|
@@ -39,14 +41,25 @@ Get a short description of the available flags via ```ibm-vpc-img-inst --help```
  | version       | | no |Returns ibm-vpc-img-inst's package version|
  |region| us-south| no|Geographical location for deployment and scope for available resources by the IBM-VPC service. Regions are listed <a href="https://cloud.ibm.com/docs/vpc?topic=vpc-creating-a-vpc-in-a-different-region&interface=cli"> here</a>. |
  |base-image-name| ibm-ubuntu-20-04-4-minimal-amd64-2| no| Prefix of an image name from your account, on which the produced image will be based. Could be either an IBM stock image as explained [here](https://cloud.ibm.com/docs/vpc?topic=vpc-about-images) or a custom image.|
-  | installation-type| Ubuntu | no |type of installation to use, e.g. for feature CUDA the currently supported types are: Ubuntu and RHEL.|
-  | feature| CUDA | no |Feature to install on the produced image. Currently supporting: CUDA and Docker.|
-  | cleanup| no | no |Path to a resources file, that will be submitted for deletion. Program will be terminated afterwards.|
+  | installation-type| Ubuntu | no |type of installation to use, e.g. for feature cuda the currently supported types are: Ubuntu and RHEL.|
+  | feature| cuda | no |Feature to install on the produced image. Currently supporting: cuda and docker.|
+  | cleanup| no | no |Path to a resources file, that will be submitted for deletion. Program will be terminated subsequently.|
  compute_iam_endpoint|https://iam.cloud.ibm.com|no|Alternative IAM endpoint url for the cloud provider, e.g. https://iam.test.cloud.ibm.com|
 
 
+## Extendability & Contribution
+To extend the features/installation types this program support, please follow the next steps:
+1. Create a folder named after the feature in camel case format, e.g nodeJS
+2. Create installation type scripts for the feature and name them in the following format: `install_<FeatureName>_<installation_type>.sh`, e.g. "install_cuda_ubuntu.sh".
+3. Store the scripts in their respective feature folder.
+4. To extend the tool for your own personal use, place the feature folder in `~/.ibm-vpc-img-inst`.  
+To contribute a new feature place its folder under the project's `src/ibm_vpc_img_inst/installation_scripts`.  
+
+
+
 ## Clean-up
-All resources created during the execution of the program will be automatically removed and unregistered from the IBM-VPC, apart from the created image. This process also takes place upon a failed run. 
+All resources created during the execution of the program will be automatically removed and unregistered from the IBM-VPC (apart from the created image). This process also takes place upon a failed run. 
 #### Manual clean-up
-To manually remove created resources run: `ibm-vpc-img-inst -c <path_to_resources_file>`.
-Users may have to resort to running this command in the odd occasion where this program fails to remove its byproducts. The default path to the resources file is located in the `logs` folder.  
+To manually remove byproduct resources run: `ibm-vpc-img-inst -c <path_to_resources_file>`.  
+Users may have to resort to running this command in the odd occasion where this program fails to remove its byproducts.   
+The default path to the resources file is located in the `logs` folder.  

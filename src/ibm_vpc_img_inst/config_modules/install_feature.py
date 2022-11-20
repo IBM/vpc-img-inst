@@ -2,16 +2,15 @@ from ibm_vpc_img_inst.config_builder import ConfigBuilder, spinner
 from typing import Any, Dict
 import paramiko
 import time
-import sys
 import os
 from ibm_vpc_img_inst.utils import color_msg, Color, logger, get_unique_file_name, DEFAULTS
-from ibm_vpc_img_inst.constants import DIR_PATH
+from ibm_vpc_img_inst.constants import DIR_PATH, USER_SCRIPTS_FOLDER
 
 class FeatureInstall(ConfigBuilder):
     def __init__(self, base_config: Dict[str, Any]) -> None:
         super().__init__(base_config)
         self.feature = self.base_config['feature']
-        self.installation_type = self.base_config['installation_type']
+        self.installation_script = self.base_config['script_path']
         self.inst_retries = DEFAULTS['script_inst_retries']
 
     def run(self) -> Dict[str, Any]:
@@ -34,10 +33,11 @@ class FeatureInstall(ConfigBuilder):
                 # Blocking call. returns when script completed/failed
                 exit_status = stdout.channel.recv_exit_status()          
                 if exit_status == 0:
-                    logger.info(color_msg("installation script executed successfully.",color=Color.GREEN))
+                    logger.info(color_msg("installation script executed successfully.",color=Color.LIGHTGREEN))
                     return True
                 elif self.inst_retries:
-                    logger.error(color_msg("Error executing script. Retrying...",color=Color.RED))
+                    time.sleep(2)
+                    logger.error(color_msg(f"""Error executing "{self.installation_script}". Retrying...""",color=Color.RED))
 
             raise Exception("Script installation failed. Terminating program.")
 
@@ -58,9 +58,8 @@ class FeatureInstall(ConfigBuilder):
             logger.critical(color_msg("\nFailed to connect to VSI via SSH. Terminating.\n", Color.RED))
             raise Exception("Failed to create to remote VM")
 
-        # file_to_execute = 'test.sh'
-        file_to_execute = f"installation_scripts{os.sep}{self.feature}{os.sep}install_{self.feature}_{self.installation_type}.sh"
-        script_name = file_to_execute.split(os.sep)[-1]
+        file_to_execute_path = self.installation_script
+        script_name = file_to_execute_path.split(os.sep)[-1]
         remote_destination = "/tmp"
 
         # Connect to remote host
@@ -71,10 +70,10 @@ class FeatureInstall(ConfigBuilder):
 
         # Setup sftp connection and transmit script
         sftp = client.open_sftp()
-        sftp.put(f'{DIR_PATH}{os.sep}{file_to_execute}',f"{remote_destination}/{script_name}")
+        # sftp.put(f'{DIR_PATH}{os.sep}{file_to_execute}',f"{remote_destination}/{script_name}")
+        sftp.put(f'{file_to_execute_path}',f"{remote_destination}/{script_name}")
         sftp.close()
         _run_remote_script()
         client.close()
 
         return self.base_config
-

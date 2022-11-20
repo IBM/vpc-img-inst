@@ -7,6 +7,7 @@ import time
 import uuid
 from enum import Enum
 from os.path import isfile, join
+from ibm_vpc_img_inst.constants import USER_SCRIPTS_FOLDER
 
 import ibm_cloud_sdk_core
 import inquirer
@@ -389,16 +390,42 @@ def append_random_suffix(base_name:str):
     else:
         return base_name + '-' + rand
 
-def create_logs_folder(log_folder_path):
+def create_folders(log_folder_path):
     if not os.path.exists(log_folder_path):
-        os.makedirs(log_folder_path)
+        os.makedirs(log_folder_path)  
+    if not USER_SCRIPTS_FOLDER:
+        os.makedirs(USER_SCRIPTS_FOLDER)
 
 def get_supported_features():
-    path = DIR_PATH+os.sep+"installation_scripts"
-    return next(os.walk(path))[1]
+    project_path = DIR_PATH+os.sep+"installation_scripts"
+    project_features = [feature for feature in next(os.walk(project_path))[1]]
+    user_features = [feature for feature in next(os.walk(USER_SCRIPTS_FOLDER))[1]]
+    return project_features + user_features
 
 def get_installation_types_for_feature(feature):
-    path = DIR_PATH+os.sep+"installation_scripts"+os.sep+feature
-    files = [f for f in os.listdir(path) if isfile(join(path, f))]
-    inst_types = [file[file.rfind('_')+1:file.rfind('.')] for file in files]
-    return inst_types
+    """
+    returns a dict in the key:val format of installation_type_name:path_to_script 
+    Note: installation scripts in user's scripts folder (USER_SCRIPTS_FOLDER) will override similarly named scripts for the same feature, 
+          found in the project's scripts folder.
+    """
+
+    def _get_scripts(feature_path):
+        """populates inst_types with scripts belonging to the specified feature"""
+        if os.path.exists(feature_path):
+            # collect file names under the feature folder 
+            feature_script_files = [f for f in os.listdir(feature_path) if isfile(join(feature_path, f))]  #  e.g. install_docker_rhel.sh
+            # extract installation type names from above feature_script_files
+            inst_types = [file[file.rfind('_')+1:file.rfind('.')] for file in feature_script_files]  #  e.g. rhel
+
+            for inst_name,path in [*zip(inst_types,feature_script_files)]:
+                
+                matching_scripts_path[inst_name] = feature_path+os.sep+path
+
+    matching_scripts_path = {}
+    user_feature_scripts_path = USER_SCRIPTS_FOLDER+os.sep+feature
+    project_feature_scripts_path = DIR_PATH+os.sep+"installation_scripts"+os.sep+feature
+
+    _get_scripts(project_feature_scripts_path)
+    _get_scripts(user_feature_scripts_path)
+
+    return matching_scripts_path
