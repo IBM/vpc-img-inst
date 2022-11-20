@@ -8,7 +8,7 @@ from ibm_vpc_img_inst import config_modules
 from ibm_vpc_img_inst.config_modules.delete_resources import clean_up
 from ibm_vpc_img_inst.constants import DEFAULTS
 
-from ibm_vpc_img_inst.utils import (Color, color_msg, create_logs_folder,
+from ibm_vpc_img_inst.utils import (Color, color_msg, create_folders,
                                     get_confirmation, logger, verify_paths,
                                     get_installation_types_for_feature,get_supported_features)
 
@@ -22,9 +22,12 @@ from ibm_vpc_img_inst.utils import (Color, color_msg, create_logs_folder,
 @click.option('--base-image-name','-im', show_default=True, default=DEFAULTS['base_image_name'], help='Prefix of image names from your account, on which the produced image will be based')
 @click.option('--installation-type','-it',show_default=True, default=DEFAULTS['installation_type'], help='type of installation to use, e.g. for feature CUDA the currently supported types are: Ubuntu and RHEL.')
 @click.option('--feature','-f', show_default=True, default=DEFAULTS['feature'], help='Feature to install on the produced image. Currently: CUDA or Docker.')
+@click.option('--cleanup','-c', show_default=True, default=None, help='Path to a resources file, that will be submitted for deletion. Program will be terminated afterwards.')
 @click.option('--compute-iam-endpoint', help='IAM endpoint url used for compute instead of default https://iam.cloud.ibm.com')
-def builder(iam_api_key, output_folder, input_file, version, region, yes, base_image_name, installation_type, feature, compute_iam_endpoint):
-    create_logs_folder(output_folder)
+def builder(iam_api_key, output_folder, input_file, version, region, yes, base_image_name, installation_type, feature, cleanup, compute_iam_endpoint):
+    if cleanup:
+        clean_up(cleanup)
+        exit(0)
 
     if version:
         print(f"{pkg_resources.get_distribution('ibm-vpc-img-inst').project_name}"
@@ -32,6 +35,8 @@ def builder(iam_api_key, output_folder, input_file, version, region, yes, base_i
         exit(0)
 
     logger.info((color_msg("Welcome to IBM VPC Image Installer", color=Color.YELLOW)))
+
+    create_folders(output_folder) # creates logs and user scripts folder
 
     # if input_file is empty, path to defaults.py is returned.
     input_file, output_file = verify_paths(input_file, output_folder)
@@ -63,7 +68,7 @@ def builder(iam_api_key, output_folder, input_file, version, region, yes, base_i
         try:
             base_config = next_module.run()
         except Exception as e:
-            logger.critical(f"Exception:\n{e}")
+            logger.critical(f"Exception in {next_module.__class__.__name__} \n{e}")
             logger.info(color_msg("Program failed. Deleting created resources",color=Color.RED))
             clean_up(output_file)
             sys.exit(1)

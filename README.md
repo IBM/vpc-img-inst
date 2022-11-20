@@ -28,7 +28,7 @@ Get a short description of the available flags via ```ibm-vpc-img-inst --help```
 
 <br/>
 
-#### Flags Detailed Description
+### Flags Detailed Description
 
 <!--- <img width=125/> is used in the following table to create spacing --->
  |<span style="color:orange">Key|<span style="color:orange">Default|<span style="color:orange">Mandatory|<span style="color:orange">Additional info|
@@ -41,5 +41,12 @@ Get a short description of the available flags via ```ibm-vpc-img-inst --help```
  |base-image-name| ibm-ubuntu-20-04-4-minimal-amd64-2| no| Prefix of an image name from your account, on which the produced image will be based. Could be either an IBM stock image as explained [here](https://cloud.ibm.com/docs/vpc?topic=vpc-about-images) or a custom image.|
   | installation-type| Ubuntu | no |type of installation to use, e.g. for feature CUDA the currently supported types are: Ubuntu and RHEL.|
   | feature| CUDA | no |Feature to install on the produced image. Currently supporting: CUDA and Docker.|
+  | cleanup| no | no |Path to a resources file, that will be submitted for deletion. Program will be terminated afterwards.|
  compute_iam_endpoint|https://iam.cloud.ibm.com|no|Alternative IAM endpoint url for the cloud provider, e.g. https://iam.test.cloud.ibm.com|
 
+
+## Clean-up
+All resources created during the execution of the program will be automatically removed and unregistered from the IBM-VPC, apart from the created image. This process also takes place upon a failed run. 
+#### Manual clean-up
+To manually remove created resources run: `ibm-vpc-img-inst -c <path_to_resources_file>`.
+Users may have to resort to running this command in the odd occasion where this program fails to remove its byproducts. The default path to the resources file is located in the `logs` folder.  
