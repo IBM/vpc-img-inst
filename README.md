@@ -26,8 +26,6 @@ ibm-vpc-img-inst [--iam-api-key IAM_API_KEY] [--region REGION] [-i INPUT_FILE] [
 
 Get a short description of the available flags via ```ibm-vpc-img-inst --help```
 
-<br/>
-
 ### Flags Detailed Description
 Note - Flags' values are case sensitive.  
 For example `--feature cuda` also represents the folder's name, ergo the program will fail to detect the feature using `--feature CUDA`.     
