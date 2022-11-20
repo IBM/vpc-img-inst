@@ -2,10 +2,14 @@
 # -*- coding: utf-8 -*-
 import re
 import sys
-
+import os
+from ibm_vpc_img_inst.constants import USER_SCRIPTS_FOLDER
 from ibm_vpc_img_inst.main import builder
 
 
 if __name__ == '__main__':
+    # Create the users scripts folder unless already existing
+    if not os.path.exists(USER_SCRIPTS_FOLDER):  
+        os.makedirs(USER_SCRIPTS_FOLDER)
     sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])
     sys.exit(builder())
