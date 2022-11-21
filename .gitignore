@@ -51,7 +51,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
-src/ibm_vpc_img_inst/TEST
+/TEST
 
 # Translations
 *.mo
