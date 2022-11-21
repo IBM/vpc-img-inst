@@ -1,6 +1,6 @@
 from typing import Any, Dict
 from ibm_vpc_img_inst.config_builder import ConfigBuilder, update_decorator, spinner
-from ibm_vpc_img_inst.utils import logger, color_msg, Color
+from ibm_vpc_img_inst.utils import logger, color_msg, Color, CACHE
 
 
 
@@ -9,14 +9,22 @@ class ImageConfig(ConfigBuilder):
     def __init__(self, base_config: Dict[str, Any]) -> None:
         super().__init__(base_config)
 
-    def run(self) -> Dict[str, Any]:
+    @spinner
+    def get_image_objects(self):
+        images = []
+        res = self.ibm_vpc_client.list_images().get_result()
+        images.extend(res['images'])
 
-        @spinner
-        def get_image_objects():
-            return self.ibm_vpc_client.list_images().get_result()['images']
-            
-        image_objects = get_image_objects()
+        while res.get('next',None):
+            link_to_next = res['next']['href'].split('start=')[1].split('&limit')[0]
+            res = self.ibm_vpc_client.list_images(start=link_to_next).get_result()
+            images.extend(res['images'])
+        return images
+
+    def run(self) -> Dict[str, Any]:
+        image_objects = self.get_image_objects()
         image = next((img for img in image_objects if img['name'].startswith(self.base_config['user_image_name'])), None)
+        
         if not image:
             logger.critical(color_msg(f"Base image chosen: {self.base_config['user_image_name']} doesn't exist. ",color=Color.RED))
             raise Exception
@@ -26,3 +34,5 @@ class ImageConfig(ConfigBuilder):
 
         logger.info(f"image Chosen: {image['name']}")
         return self.base_config
+
+

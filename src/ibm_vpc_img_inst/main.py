@@ -31,7 +31,7 @@ def builder(iam_api_key, output_folder, input_file, version, region, yes, base_i
 
     if version:
         print(f"{pkg_resources.get_distribution('ibm-vpc-img-inst').project_name}"
-              f"{pkg_resources.get_distribution('ibm-vpc-img-inst').version}")
+              f"-{pkg_resources.get_distribution('ibm-vpc-img-inst').version}")
         exit(0)
 
     logger.info((color_msg("Welcome to IBM VPC Image Installer", color=Color.YELLOW)))
@@ -56,13 +56,14 @@ def builder(iam_api_key, output_folder, input_file, version, region, yes, base_i
     base_config['feature'] = feature
 
     logger.info(color_msg(f"""\n\nBase Image Name: {base_config['user_image_name']}\nFeature: {base_config['feature']}\nInstallation Type: {base_config['installation_type']}\nRegion: {base_config['region']}\nImage Creation Retries: {DEFAULTS['image_create_retries']} """, color=Color.YELLOW))
+    logger.info(color_msg(f"\n\nCreated resources will be logged in {output_file}.\n", color=Color.YELLOW))
     if not yes:
         confirmation = get_confirmation(f"Proceed?")['answer']
         if not confirmation:
             sys.exit(0)
 
     base_config['script_path']=get_script_path(base_config['feature'],base_config['installation_type'])
-    
+
     for module in modules:
         next_module = module(base_config)
         try:

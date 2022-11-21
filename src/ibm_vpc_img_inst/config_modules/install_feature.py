@@ -4,7 +4,6 @@ import paramiko
 import time
 import os
 from ibm_vpc_img_inst.utils import color_msg, Color, logger, get_unique_file_name, DEFAULTS
-from ibm_vpc_img_inst.constants import DIR_PATH, USER_SCRIPTS_FOLDER
 
 class FeatureInstall(ConfigBuilder):
     def __init__(self, base_config: Dict[str, Any]) -> None:
@@ -70,7 +69,6 @@ class FeatureInstall(ConfigBuilder):
 
         # Setup sftp connection and transmit script
         sftp = client.open_sftp()
-        # sftp.put(f'{DIR_PATH}{os.sep}{file_to_execute}',f"{remote_destination}/{script_name}")
         sftp.put(f'{file_to_execute_path}',f"{remote_destination}/{script_name}")
         sftp.close()
         _run_remote_script()
