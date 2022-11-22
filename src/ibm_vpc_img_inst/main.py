@@ -36,7 +36,7 @@ def builder(iam_api_key, output_folder, input_file, version, region, yes, base_i
 
     logger.info((color_msg("Welcome to IBM VPC Image Installer", color=Color.YELLOW)))
 
-    create_folders(output_folder) # creates logs and user scripts folder
+    create_folders() # creates user scripts folder if does not exist
 
     # if input_file is empty, path to defaults.py is returned.
     input_file, output_file = verify_paths(input_file, output_folder)

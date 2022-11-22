@@ -390,10 +390,8 @@ def append_random_suffix(base_name:str):
     else:
         return base_name + '-' + rand
 
-def create_folders(log_folder_path):
-    if not os.path.exists(log_folder_path):
-        os.makedirs(log_folder_path)  
-    if not USER_SCRIPTS_FOLDER:
+def create_folders(): 
+    if not os.path.exists(USER_SCRIPTS_FOLDER):
         os.makedirs(USER_SCRIPTS_FOLDER)
 
 def get_supported_features():
