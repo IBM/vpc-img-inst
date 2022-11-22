@@ -10,7 +10,10 @@ Mostly tested with Fedora 35 and Ubuntu 20, but should work with most Linux and 
 - `ssh-keygen` utility - available as part of the Open SSH client.
 
 #### Installation
-- `pip install ibm-vpc-img-inst`
+- `pip install ibm-vpc-img-inst`  
+following installation a directory containing various  scripts will be created in  `~/.ibm-vpc-img-inst`.   
+Note - said directory formation will not take place if it's already existing, to avoid overriding user data. 
+
 ## Usage
 - Create a new custom image:
 ```
