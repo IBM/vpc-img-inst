@@ -112,8 +112,8 @@ class DeleteResources(ConfigBuilder):
 
 
     def poll_instance_exists(self,instance_id):
-        tries = 30 # waits up to 1 min with 2 sec interval
-        sleep_interval = 2
+        tries = 30 # waits up to 5 min with 10 sec interval
+        sleep_interval = 10
         msg = ""
         while tries:
             try:
@@ -129,8 +129,8 @@ class DeleteResources(ConfigBuilder):
         return False
 
     def poll_subnet_exists(self,subnet_id):
-        tries = 30 # waits up to 1 min with 2 sec interval
-        sleep_interval = 4
+        tries = 30 # waits up to 5 min with 10 sec interval
+        sleep_interval = 10
         msg = ""
         while tries:
             try:
