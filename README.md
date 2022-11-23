@@ -8,11 +8,12 @@ ibm-vpc-img-inst is a CLI tool that automates generation of custom VSI images by
 Mostly tested with Fedora 35 and Ubuntu 20, but should work with most Linux and Mac systems.   
 #### Requirements
 - `ssh-keygen` utility - available as part of the Open SSH client.
+- Python3.
 
 #### Installation
 - `pip install ibm-vpc-img-inst`  
-following installation a directory containing various  scripts will be created in  `~/.ibm-vpc-img-inst`.   
-Note - said directory formation will not take place if it's already existing, to avoid overriding user data. 
+Following installation, a directory containing various scripts will be created in  `~/.ibm-vpc-img-inst`.   
+Note - the directory will not be created or overwritten if it already exists. 
 
 ## Usage
 - Create a new custom image:
