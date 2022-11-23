@@ -44,8 +44,6 @@ class VPCConfig(ConfigBuilder):
                                                 'subnet_id':subnet_objects[0]['id']})
 
         self.base_config['zone_name'] = zone_obj['name']                                                
-        store_output({'vpc_id':vpc_obj['id']},self.base_config)
-        store_output({"subnet_id":subnet_objects[0]['id']},self.base_config)
         return self.base_config
 
     def _build_security_group_rule_prototype_model(self, missing_rule, sg_id=None):
@@ -105,6 +103,7 @@ class VPCConfig(ConfigBuilder):
         subnet_data = ibm_vpc_client.create_subnet(
             subnet_prototype).result
         subnet_id = subnet_data['id']
+        store_output({"subnet_id":subnet_id},self.base_config)
         logger.info(color_msg(f"Created subnet: {subnet_prototype['name']} with id: {subnet_id}",color=Color.LIGHTGREEN))
 
         # Update security group to have all required rules
@@ -188,6 +187,7 @@ class VPCConfig(ConfigBuilder):
             vpc_name = append_random_suffix(base_name=self.vpc_name)
             vpc_obj = _create_vpc(vpc_name)
             vpc_id = vpc_obj['id']
+            store_output({'vpc_id':vpc_id},self.base_config)
 
             logger.info(color_msg(f"Created VPC: {vpc_name} with id: {vpc_id}",color=Color.LIGHTGREEN))
 
