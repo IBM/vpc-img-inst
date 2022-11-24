@@ -398,7 +398,7 @@ def get_supported_features():
     project_path = DIR_PATH+os.sep+"installation_scripts"
     project_features = [feature for feature in next(os.walk(project_path))[1]]
     user_features = [feature for feature in next(os.walk(USER_SCRIPTS_FOLDER))[1]]
-    return project_features + user_features
+    return set(project_features + user_features)
 
 def get_installation_types_for_feature(feature):
     """
