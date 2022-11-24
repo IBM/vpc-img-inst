@@ -10,11 +10,15 @@ class ImageCreate(ConfigBuilder):
     def __init__(self, base_config: Dict[str, Any]) -> None:
         super().__init__(base_config)
         self.retries = DEFAULTS['image_create_retries']
+        self.features = self.base_config['feature']
 
     def run(self) -> Dict[str, Any]:
         instance_volume_attachments = self.ibm_vpc_client.list_instance_volume_attachments(self.base_config['node_config']['vsi_id']).get_result()
         boot_volume_id = instance_volume_attachments['volume_attachments'][0]['volume']['id']
-        default_image_name = f"""{self.base_config['feature']}-{self.base_config['node_config']['image_name']}"""  
+        default_image_name = ''
+        for feature in self.features:
+            default_image_name += feature+'-'
+        default_image_name += f"""{self.base_config['node_config']['image_name']}"""  
         image_name = append_random_suffix(base_name=default_image_name)
         
         logger.info("Stopping VM instance...")

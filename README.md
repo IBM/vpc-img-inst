@@ -25,8 +25,8 @@ ibm-vpc-img-inst [--iam-api-key IAM_API_KEY] [--region REGION] [-i INPUT_FILE] [
 ### Examples
 - `ibm-vpc-img-inst -a <API_KEY> -y -f cuda -it rhel -im ibm-redhat-8-6`  
 Create a custom image of CUDA on RHEL 8.6
-- `ibm-vpc-img-inst -a <API_KEY> -y -f docker -it ubuntu` (using default base image)  
-Create a custom image of Docker on Ubuntu (default 20.4) 
+- `ibm-vpc-img-inst -a <API_KEY> -y -f docker -f cuda -it ubuntu` (using default base image)  
+Create a custom image of Docker and CUDA on Ubuntu (default 20.4) 
 - `ibm-vpc-img-inst --help`  
 Get a short description of the available flags via  
 - `ibm-vpc-img-inst -c <PATH_TO_FILE>`  
