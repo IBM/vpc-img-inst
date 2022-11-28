@@ -94,10 +94,10 @@ def validate_api_keys(base_config, iam_api_key, compute_iam_endpoint):
 def get_scripts_path(features,installation_type):
     """returns script path to execute in case both the specified feature exists and the installation type exits for it"""
     scripts = []
-    features = get_supported_features()
+    supported_features = get_supported_features()
     for feature in features:
         
-        if feature not in features:
+        if feature not in supported_features:
             logger.critical(color_msg(f"Feature Chosen: {feature} isn't supported ",color=Color.RED))
             raise Exception("Invalid feature argument.")
         
