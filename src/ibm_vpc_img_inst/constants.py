@@ -5,7 +5,7 @@ DIR_PATH = os.path.dirname(os.path.realpath(__file__))  # absolute path to proje
 USER_SCRIPTS_FOLDER = str(Path.home())+os.sep+".ibm-vpc-img-inst" 
 
 DEFAULTS = {'base_image_name':'ibm-ubuntu-20-04',  
-            'region':'us-south',
+            'region':'eu-de',
              'installation_type':"ubuntu",
              "feature":"cuda", 
              "image_create_retries":3, 
