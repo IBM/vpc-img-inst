@@ -383,12 +383,15 @@ def store_output(data:dict, config):
         yaml.dump(data, file, default_flow_style=False)
 
 def append_random_suffix(base_name:str):
+    """appends a unique suffix (minimum length of 10 chars) to VPC resources"""
+    min_chars_to_append = 10
     max_length = 62  # max length allowed for naming ibm resources is 63. separating the random part with a '-' decreases it to 62.    
-    rand = str(uuid.uuid4())
-    if len(base_name) + len(rand) > max_length:
-        return base_name + '-' + rand[:(max_length-len(base_name)-len(rand))]
+    suffix = str(uuid.uuid4())
+    if len(base_name) + len(suffix) > max_length: 
+        # appends the last 10 chars of suffix to the first 51 chars of base_name with a dash in between. 
+        return base_name[:max_length-min_chars_to_append] + '-' + suffix[-min_chars_to_append:]
     else:
-        return base_name + '-' + rand
+        return base_name + '-' + suffix
 
 def create_folders(): 
     if not os.path.exists(USER_SCRIPTS_FOLDER):
