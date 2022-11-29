@@ -14,7 +14,6 @@ from ibm_vpc_img_inst.utils import (Color, color_msg, create_folders,
 
 @click.command()
 @click.option('--output-folder', '-o', show_default=True, default=DEFAULTS['output_folder'], help='Path to folder storing IDs of resources created by this program and installation logs')
-@click.option('--input-file', '-i',show_default=True, default=DEFAULTS['input_file'], help=f'Template for the new configuration')
 @click.option('--iam-api-key', '-a', help='IAM_API_KEY')
 @click.option('--version', '-v', help=f'Get package version', is_flag=True)
 @click.option('--region','-r', show_default=True, default=DEFAULTS['region'], help='IBM Cloud region, e.g: us-south, us-east, eu-de, eu-gb.')
@@ -24,7 +23,7 @@ from ibm_vpc_img_inst.utils import (Color, color_msg, create_folders,
 @click.option('--feature','-f', show_default=True,default=[DEFAULTS['feature']], multiple=True, help='Feature to install on the produced image. Currently: "cuda" or "docker".')
 @click.option('--cleanup','-c', show_default=True, default=None, help='Path to a resources file, that will be submitted for deletion. Program will be terminated subsequently.')
 @click.option('--compute-iam-endpoint', help='IAM endpoint url used for compute instead of default https://iam.cloud.ibm.com')
-def builder(iam_api_key, output_folder, input_file, version, region, yes, base_image_name, installation_type, feature, cleanup, compute_iam_endpoint):
+def builder(iam_api_key, output_folder, version, region, yes, base_image_name, installation_type, feature, cleanup, compute_iam_endpoint):
     if cleanup:
         clean_up(cleanup)
         exit(0)
@@ -39,7 +38,7 @@ def builder(iam_api_key, output_folder, input_file, version, region, yes, base_i
     create_folders() # creates user scripts folder if does not exist
 
     # if input_file is empty, path to defaults.py is returned.
-    input_file, output_file = verify_paths(input_file, output_folder)
+    input_file, output_file = verify_paths("", output_folder)
     
     with open(input_file) as f:
         base_config = yaml.safe_load(f)
