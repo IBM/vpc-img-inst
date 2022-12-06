@@ -4,11 +4,11 @@ import sys
 import click
 import pkg_resources
 import yaml
-from ibm_vpc_img_inst import config_modules
-from ibm_vpc_img_inst.config_modules.delete_resources import clean_up
-from ibm_vpc_img_inst.constants import DEFAULTS
+from vpc_img_inst import config_modules
+from vpc_img_inst.config_modules.delete_resources import clean_up
+from vpc_img_inst.constants import DEFAULTS
 
-from ibm_vpc_img_inst.utils import (Color, color_msg, create_folders,
+from vpc_img_inst.utils import (Color, color_msg, create_folders,
                                     get_confirmation, logger, verify_paths,
                                     get_installation_types_for_feature,get_supported_features)
 
@@ -29,8 +29,8 @@ def builder(iam_api_key, output_folder, version, region, yes, base_image_name, i
         exit(0)
 
     if version:
-        print(f"{pkg_resources.get_distribution('ibm-vpc-img-inst').project_name}"
-              f"-{pkg_resources.get_distribution('ibm-vpc-img-inst').version}")
+        print(f"{pkg_resources.get_distribution('vpc-img-inst').project_name}"
+              f"-{pkg_resources.get_distribution('vpc-img-inst').version}")
         exit(0)
 
     logger.info((color_msg("Welcome to IBM VPC Image Installer", color=Color.YELLOW)))

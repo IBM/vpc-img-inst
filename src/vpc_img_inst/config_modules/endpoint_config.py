@@ -1,7 +1,7 @@
 import sys
-from ibm_vpc_img_inst.config_builder import ConfigBuilder, update_decorator, spinner
+from vpc_img_inst.config_builder import ConfigBuilder, update_decorator, spinner
 from typing import Any, Dict
-from ibm_vpc_img_inst.utils import logger,color_msg,Color
+from vpc_img_inst.utils import logger,color_msg,Color
 
 
 class EndpointConfig(ConfigBuilder):

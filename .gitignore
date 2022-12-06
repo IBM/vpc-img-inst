@@ -12,7 +12,7 @@ build/
 develop-eggs/
 dist/
 downloads/
-src/ibm_vpc_img_inst/logs/*
+src/vpc_img_inst/logs/*
 eggs/
 .eggs/
 lib/

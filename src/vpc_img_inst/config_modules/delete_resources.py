@@ -5,10 +5,10 @@ import yaml
 import sys
 from typing import Any, Dict
 
-from ibm_vpc_img_inst.constants import DEFAULTS
+from vpc_img_inst.constants import DEFAULTS
 sys.path.append('../generate_gpu_image')
-from ibm_vpc_img_inst.config_builder import ConfigBuilder
-from ibm_vpc_img_inst.utils import color_msg, Color, logger
+from vpc_img_inst.config_builder import ConfigBuilder
+from vpc_img_inst.utils import color_msg, Color, logger
 from ibm_cloud_sdk_core import ApiException
 
 class DeleteResources(ConfigBuilder):

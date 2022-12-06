@@ -7,12 +7,12 @@ import time
 import uuid
 from enum import Enum
 from os.path import isfile, join
-from ibm_vpc_img_inst.constants import USER_SCRIPTS_FOLDER
+from vpc_img_inst.constants import USER_SCRIPTS_FOLDER
 
 import ibm_cloud_sdk_core
 import inquirer
 import yaml
-from ibm_vpc_img_inst.constants import DEFAULTS, DIR_PATH
+from vpc_img_inst.constants import DEFAULTS, DIR_PATH
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from ibm_platform_services import IamIdentityV1
 from inquirer import errors
