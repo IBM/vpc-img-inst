@@ -23,11 +23,14 @@ class ImageConfig(ConfigBuilder):
 
     def run(self) -> Dict[str, Any]:
         image_objects = self.get_image_objects()
-        image = next((img for img in image_objects if img['name'].startswith(self.base_config['user_image_name'])), None)
+        # picks the first image with AMD architecture (opposed to s390x) that contains prefix matching user's input (-im flag).   
+        image = next((img for img in image_objects if img['name'].startswith(self.base_config['user_image_name']) \
+            and img['operating_system']['architecture'].startswith('amd')), None)
         
         if not image:
             logger.critical(color_msg(f"Base image chosen: {self.base_config['user_image_name']} doesn't exist. ",color=Color.RED))
             raise Exception
+            
         self.base_config['node_config']['image_id'] = image['id']
         self.base_config['node_config']['image_name'] = image['name']
         self.base_config['node_config']['boot_volume_capacity'] = self.base_config['node_config'].get("boot_volume_capacity", 100)
