@@ -36,7 +36,7 @@ setup(
     version='1.0.0b3',
     author =' Omer J Cohen',
     author_email = 'cohen.j.omer@gmail.com',
-    description = 'Produces IBM-VPC custom image in users account with an installed tool of their choosing',
+    description = 'vpc-img-inst is a lightweight script for quick-and-dirty generation of custom VSI images by installing features (software bundles) on base images.',
     long_description=read('README.md'),
     long_description_content_type = "text/markdown",
     url = 'https://github.com/IBM-Cloud/vpc-img-inst',
