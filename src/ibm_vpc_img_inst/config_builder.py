@@ -39,7 +39,8 @@ class ConfigBuilder:
 
         self.defaults = {}
         self.base_config = base_config
-        ConfigBuilder.iam_api_key = self.base_config["iam_api_key"] if 'delete_resources' in base_config else ConfigBuilder.iam_api_key
+        if base_config.get('delete_resources',None):
+            ConfigBuilder.iam_api_key = self.base_config["iam_api_key"]
         
         if not self.ibm_vpc_client and ConfigBuilder.iam_api_key:
             authenticator = IAMAuthenticator(ConfigBuilder.iam_api_key, url=ConfigBuilder.compute_iam_endpoint)

@@ -16,6 +16,7 @@ class DeleteResources(ConfigBuilder):
         super().__init__(base_config)
         self.base_config = base_config
         if 'delete_resources' in base_config:
+            self.ibm_vpc_client.set_service_url(self.base_config['endpoint'] + '/v1')
             self.delete_config()
 
     def run(self) -> Dict[str, Any]:
@@ -166,6 +167,7 @@ def clean_up(output_file=None):
     auth = {"auth":{"ssh_private_key":resources['ssh_private_key'] if 'ssh_private_key' in resources else ''}}
 
     base_config.update({"iam_api_key": resources['iam_api_key']})
+    base_config.update({"endpoint": resources['endpoint']})
     base_config.update(auth)
     base_config.update(node_config)
     # __init__ of DeleteResources starts the clean-up process when this module is run independently.     
