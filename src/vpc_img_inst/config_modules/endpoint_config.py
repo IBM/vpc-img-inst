@@ -20,7 +20,7 @@ class EndpointConfig(ConfigBuilder):
         if not region_obj:
              logger.critical(color_msg(f"Region Chosen: {self.region} is invalid ",color=Color.RED))
              raise Exception("Invalid argument")
-        ConfigBuilder.ibm_vpc_client.set_service_url(region_obj['endpoint'] + '/v1')   # update global ibm_vpc_client to selected endpoint
+        self.ibm_vpc_client.set_service_url(region_obj['endpoint'] + '/v1')   # update global ibm_vpc_client to selected endpoint
         ConfigBuilder.region = region_obj['name']
         store_output({'endpoint':region_obj['endpoint']},self.base_config)  # to enable user to manually execute the clean-up module at a later time.  
         

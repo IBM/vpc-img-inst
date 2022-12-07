@@ -44,20 +44,9 @@ class ConfigBuilder:
         
         if not self.ibm_vpc_client and ConfigBuilder.iam_api_key:
             authenticator = IAMAuthenticator(ConfigBuilder.iam_api_key, url=ConfigBuilder.compute_iam_endpoint)
-            ConfigBuilder.ibm_vpc_client = VpcV1('2022-06-30',authenticator=authenticator)
-            ConfigBuilder.resource_service_client = ResourceManagerV2(authenticator=authenticator)
-            ConfigBuilder.resource_controller_service = ResourceControllerV2(authenticator=authenticator)
-
-            self.init_clients()
-
-            
-    def init_clients(self):
-        
-        self.ibm_vpc_client = ConfigBuilder.ibm_vpc_client
-        self.resource_service_client = ConfigBuilder.resource_service_client
-        self.resource_controller_service = ConfigBuilder.resource_controller_service
-
-    """Interacts with user to get all required parameters"""
+            self.ibm_vpc_client = VpcV1('2022-06-30',authenticator=authenticator)
+            self.resource_service_client = ResourceManagerV2(authenticator=authenticator)
+            self.resource_controller_service = ResourceControllerV2(authenticator=authenticator)
 
     def run(self, config) -> Dict[str, Any]:
         """Return updated config dictionary that can be dumped to config file
