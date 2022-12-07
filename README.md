@@ -1,7 +1,6 @@
 # Image Installer For IBM-VPC
 
-vpc-img-inst is a CLI tool that automates generation of custom VSI images by installing _features_ (software bundles) on base images
-
+vpc-img-inst is a lightweight script for quick-and-dirty generation of custom VSI images by installing features (software bundles) on base images.
 
 ## Setup
 

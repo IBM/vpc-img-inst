@@ -1,6 +1,5 @@
 import os
 import sys
-
 import click
 import pkg_resources
 import yaml
@@ -33,7 +32,7 @@ def builder(iam_api_key, output_folder, version, region, yes, base_image_name, i
               f"-{pkg_resources.get_distribution('vpc-img-inst').version}")
         exit(0)
 
-    logger.info((color_msg("Welcome to IBM VPC Image Installer", color=Color.YELLOW)))
+    logger.info((color_msg("VPC Image Installer Starting...", color=Color.YELLOW)))
 
     create_folders() # creates user scripts folder if does not exist
 

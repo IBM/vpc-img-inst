@@ -33,7 +33,7 @@ find_packages(where='src',exclude=['logs'])
 
 setup(
     name='vpc-img-inst',
-    version='1.0.0b1',
+    version='1.0.0b3',
     author =' Omer J Cohen',
     author_email = 'cohen.j.omer@gmail.com',
     description = 'Produces IBM-VPC custom image in users account with an installed tool of their choosing',

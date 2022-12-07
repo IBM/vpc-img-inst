@@ -45,7 +45,7 @@ class ImageCreate(ConfigBuilder):
 
     @spinner
     def poll_image_status(self,image_id, image_name):
-        tries = 300 # waits up to 50 min with 10 sec interval
+        tries = 300 # waits up to 50 min with 10 sec intervals
         sleep_interval = 10
         msg = ""
         while tries:
@@ -63,12 +63,12 @@ class ImageCreate(ConfigBuilder):
             else:
                 tries -= 1
                 time.sleep(sleep_interval)
-        logger.info(color_msg(f"Failed to create image {image_id} within the expected time frame of {tries*sleep_interval/60} minutes.\n", Color.RED))
+        logger.critical(color_msg(f"Failed to create image {image_id} within the expected time frame of {tries*sleep_interval/60} minutes.\n", Color.RED))
         return False
 
     @spinner
     def poll_instance_status(self, instance_id):
-        tries = 30 # waits up to 1 min with 2 sec interval
+        tries = 30 # waits up to 1 min with 2 sec intervals
         sleep_interval = 2
         msg = ""
         while tries:
@@ -81,5 +81,5 @@ class ImageCreate(ConfigBuilder):
             else:
                 tries -= 1
                 time.sleep(sleep_interval)
-        logger.info(color_msg(f"\nInstance failed to stop within expected time frame of {tries*sleep_interval/60} minutes.\n",color=Color.LIGHTGREEN))
+        logger.critical(color_msg(f"\nInstance failed to stop within expected time frame of {tries*sleep_interval/60} minutes.\n",color=Color.RED))
         return False
