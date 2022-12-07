@@ -33,13 +33,13 @@ find_packages(where='src',exclude=['logs'])
 
 setup(
     name='vpc-img-inst',
-    version='1.0.0b3',
-    author =' Omer J Cohen',
-    author_email = 'cohen.j.omer@gmail.com',
+    version='1.0.0b4',
+    author =' Omer-J-Cohen',
+    author_email = 'omer.cohen@ibm.com',
     description = 'vpc-img-inst is a lightweight script for quick-and-dirty generation of custom VSI images by installing features (software bundles) on base images.',
     long_description=read('README.md'),
     long_description_content_type = "text/markdown",
-    url = 'https://github.com/IBM-Cloud/vpc-img-inst',
+    url = 'https://github.com/IBM/vpc-img-inst',
     install_requires=[
         'click==8.0.4',
         'ibm_cloud_sdk_core==3.16.0',
