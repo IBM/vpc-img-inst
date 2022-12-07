@@ -4,10 +4,10 @@ from setuptools.command.install import install
 import os 
 import shutil
 from pathlib import Path
-PACKAGE_NAME = 'ibm-vpc-img-inst'
+PACKAGE_NAME = 'vpc-img-inst'
 INSTALLATION_DIR_NAME = 'installation_scripts'
 USER_SCRIPTS_FOLDER = str(Path.home())+os.sep+f".{PACKAGE_NAME}" 
-PROJECT_ROOT = os.path.join(os.path.dirname(os.path.realpath(__file__)),'src','ibm_vpc_img_inst')
+PROJECT_ROOT = os.path.join(os.path.dirname(os.path.realpath(__file__)),'src','vpc_img_inst')
 
 class CustomInstallCommand(install):
     """
@@ -32,14 +32,14 @@ def read(fname):
 find_packages(where='src',exclude=['logs'])
 
 setup(
-    name='ibm-vpc-img-inst',
-    version='1.0.0b6',
+    name='vpc-img-inst',
+    version='1.0.0b1',
     author =' Omer J Cohen',
     author_email = 'cohen.j.omer@gmail.com',
     description = 'Produces IBM-VPC custom image in users account with an installed tool of their choosing',
     long_description=read('README.md'),
     long_description_content_type = "text/markdown",
-    url = 'https://github.com/IBM-Cloud/ibm-vpc-img-inst',
+    url = 'https://github.com/IBM-Cloud/vpc-img-inst',
     install_requires=[
         'click==8.0.4',
         'ibm_cloud_sdk_core==3.16.0',
@@ -52,10 +52,10 @@ setup(
         'setuptools==63.2.0'
     ],
 
-    # Creates script named ibm-vpc-img-inst under ~/<python_folder>/bin/ibm-vpc-img-inst.
-    # it is asked to pass parameters to builder() of ibm_vpc_img_inst.main. 
+    # Creates script named vpc-img-inst under ~/<python_folder>/bin/vpc-img-inst.
+    # it is asked to pass parameters to builder() of vpc_img_inst.main. 
     entry_points={
-    'console_scripts': ['ibm-vpc-img-inst=ibm_vpc_img_inst:main.builder']
+    'console_scripts': ['vpc-img-inst=vpc_img_inst:main.builder']
     },
     # include otherwise undetected installation scripts and defaults.yaml  
     package_data={'': ['*.sh','*.yaml']},

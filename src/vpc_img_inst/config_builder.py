@@ -9,7 +9,7 @@ from ibm_platform_services import ResourceControllerV2, ResourceManagerV2
 from ibm_vpc import VpcV1
 from ibm_watson import IAMTokenManager
 
-from ibm_vpc_img_inst.utils import CACHE, find_default, get_option_from_list
+from vpc_img_inst.utils import CACHE, find_default, get_option_from_list
 
 logger = logging.getLogger(__name__)
 

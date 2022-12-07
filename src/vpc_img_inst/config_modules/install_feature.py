@@ -1,9 +1,9 @@
-from ibm_vpc_img_inst.config_builder import ConfigBuilder, spinner
+from vpc_img_inst.config_builder import ConfigBuilder, spinner
 from typing import Any, Dict
 import paramiko
 import time
 import os
-from ibm_vpc_img_inst.utils import color_msg, Color, logger, get_unique_file_name, DEFAULTS
+from vpc_img_inst.utils import color_msg, Color, logger, get_unique_file_name, DEFAULTS
 
 class FeatureInstall(ConfigBuilder):
     def __init__(self, base_config: Dict[str, Any]) -> None:

@@ -1,6 +1,6 @@
-from ibm_vpc_img_inst.config_builder import ConfigBuilder
+from vpc_img_inst.config_builder import ConfigBuilder
 from typing import Any, Dict
-from ibm_vpc_img_inst.utils import color_msg, Color, logger, store_output, append_random_suffix
+from vpc_img_inst.utils import color_msg, Color, logger, store_output, append_random_suffix
 
 class FloatingIpConfig(ConfigBuilder):
     def __init__(self, base_config: Dict[str, Any]) -> None:

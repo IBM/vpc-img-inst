@@ -3,8 +3,8 @@ import subprocess
 from typing import Any, Dict
 from pathlib import Path
 from inquirer import errors
-from ibm_vpc_img_inst.config_builder import ConfigBuilder, spinner
-from ibm_vpc_img_inst.utils import Color, color_msg, get_unique_file_name,logger, append_random_suffix, store_output
+from vpc_img_inst.config_builder import ConfigBuilder, spinner
+from vpc_img_inst.utils import Color, color_msg, get_unique_file_name,logger, append_random_suffix, store_output
 from ibm_cloud_sdk_core import ApiException
 DEFAULT_KEY_NAME = 'temp'
         
