@@ -23,6 +23,6 @@ DEFAULTS = {'base_image_name':'ibm-ubuntu-20-04',
              'installation_type':"ubuntu",
              "feature":"cuda", 
              "image_create_retries":3, 
-             "script_inst_retries":3,
+             "script_inst_retries":5,
              "input_file":f'{DIR_PATH}{os.sep}defaults.yaml',
              "output_folder":tempfile.mkdtemp()}

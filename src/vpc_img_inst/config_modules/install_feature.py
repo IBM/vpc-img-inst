@@ -23,13 +23,14 @@ class FeatureInstall(ConfigBuilder):
     def __init__(self, base_config: Dict[str, Any]) -> None:
         super().__init__(base_config)
         self.installation_scripts = self.base_config['scripts_path']
-        self.inst_retries = DEFAULTS['script_inst_retries']
+        
 
     def run(self) -> Dict[str, Any]:
 
         @spinner
         def _run_remote_script(script):
             feature = script[script.find('_')+1:script.rfind('_')]
+            self.inst_retries = DEFAULTS['script_inst_retries'] # reset retries for each script
             
             while self.inst_retries:  
                 self.inst_retries -= 1          
