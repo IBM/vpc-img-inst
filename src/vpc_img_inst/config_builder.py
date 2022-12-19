@@ -47,18 +47,18 @@ class ConfigBuilder:
     """
     Interface for the configuration modules
     """
-    iam_api_key, ibm_vpc_client, resource_service_client, resource_controller_service, compute_iam_endpoint, region = None, None, None, None, None, None
+    ibm_vpc_client, resource_service_client, resource_controller_service, compute_iam_endpoint, region, initialized = None, None, None, None, None, False
 
     def __init__(self, base_config: Dict[str, Any]) -> None:
 
         self.defaults = {}
         self.base_config = base_config
-        if base_config.get('delete_resources',None):
-            ConfigBuilder.iam_api_key = self.base_config["iam_api_key"]
-        
-        if not self.ibm_vpc_client and ConfigBuilder.iam_api_key:
-            authenticator = IAMAuthenticator(ConfigBuilder.iam_api_key, url=ConfigBuilder.compute_iam_endpoint)
+
+        if self.base_config.get('iam_api_key'):
+            authenticator = IAMAuthenticator(self.base_config['iam_api_key'], url=ConfigBuilder.compute_iam_endpoint)
             self.ibm_vpc_client = VpcV1('2022-06-30',authenticator=authenticator)
+            if self.base_config.get('endpoint'):
+                self.ibm_vpc_client.set_service_url(self.base_config['endpoint'] + '/v1')   # update ibm_vpc_client scope to selected endpoint
             self.resource_service_client = ResourceManagerV2(authenticator=authenticator)
             self.resource_controller_service = ResourceControllerV2(authenticator=authenticator)
 

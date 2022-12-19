@@ -182,16 +182,11 @@ class VPCConfig(ConfigBuilder):
         ibm_vpc_client = self.ibm_vpc_client
        
         while True:
-
-            @spinner
-            def list_vpcs():
-                return ibm_vpc_client.list_vpcs().get_result()['vpcs']
             @spinner
             def _create_vpc(vpc_name):
                 return ibm_vpc_client.create_vpc(address_prefix_management='auto', classic_access=False,
                                                 name=vpc_name, resource_group=resource_group).get_result()
                                                 
-            vpc_objects = list_vpcs()
             zone_obj = self._select_zone(vpc_id, region)
  
             resource_group_id = self._select_resource_group()

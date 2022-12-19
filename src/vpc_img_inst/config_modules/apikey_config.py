@@ -34,7 +34,6 @@ class ApiKeyConfig(ConfigBuilder):
                                   default=default,
                                   validate=verify_iam_api_key)['answer']
 
-        ConfigBuilder.iam_api_key = api_key
         store_output({'iam_api_key':api_key},self.base_config)
         return api_key, compute_iam_endpoint
 
@@ -48,10 +47,7 @@ class ApiKeyConfig(ConfigBuilder):
     
     def verify(self, base_config):
         api_key = base_config['iam_api_key']
-            
         ConfigBuilder.compute_iam_endpoint = self.base_config['iam_endpoint']
-        
         verify_iam_api_key(None, api_key, iam_endpoint=ConfigBuilder.compute_iam_endpoint)
-        ConfigBuilder.iam_api_key = api_key
             
         return base_config
