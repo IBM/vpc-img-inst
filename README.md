@@ -60,4 +60,7 @@ All resources created during the execution of the program will be automatically 
 #### Manual clean-up
 To manually remove byproduct resources run: `vpc-img-inst -c <path_to_resources_file>`.  
 Users may have to resort to running this command in the odd occasion where this program fails to remove its byproducts.   
-The path to the resources file is printed at the start of the execution.  
+The path to the resources file is printed at the start of the execution.
+
+## Execution Example
+![](doc_assets/example.png?raw=true)
