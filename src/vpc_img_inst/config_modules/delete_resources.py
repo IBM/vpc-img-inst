@@ -103,14 +103,22 @@ class DeleteResources(ConfigBuilder):
         
         # delete vpc
         if 'vpc_id' in self.base_config["node_config"] and self.base_config["node_config"]['vpc_id']:
-            try:
-                self.ibm_vpc_client.delete_vpc(self.base_config["node_config"]['vpc_id'])
-                logger.info(color_msg('Deleted VPC with id: {}'.format(self.base_config["node_config"]['vpc_id']), color=Color.PURPLE))
-            except ApiException as e:
-                if e.code == 404:
-                    logger.info(f"""VPC with id: "{self.base_config["node_config"]['vpc_id']}" doesn't exist""")
-                else:
-                    raise e
+            deleting_resources = True
+            sleep_duration = 10
+            while deleting_resources:
+                try:
+                    self.ibm_vpc_client.delete_vpc(self.base_config["node_config"]['vpc_id'])
+                    logger.info(color_msg('Deleted VPC with id: {}'.format(self.base_config["node_config"]['vpc_id']), color=Color.PURPLE))
+                    deleting_resources = False
+                except ApiException as e:
+                    if e.code == 404:
+                        logger.info(f"""VPC with id: "{self.base_config["node_config"]['vpc_id']}" doesn't exist""")
+                        deleting_resources = False
+                    elif e.code == 409:
+                        logger.info(f"""VPC with id: "{self.base_config["node_config"]['vpc_id']}" still in use. Retrying...""")
+                        time.sleep(sleep_duration)
+                    else:
+                        raise e
 
         # delete failed images
         failed_images = _get_failed_images(self.base_config['output_file'])

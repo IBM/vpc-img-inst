@@ -20,7 +20,7 @@ USER_SCRIPTS_FOLDER = str(Path.home())+os.sep+".vpc-img-inst"
 
 DEFAULTS = {'base_image_name':'ibm-ubuntu-22-04',  
             'region':'eu-de',
-             'installation_type':"ubuntu-22",
+             'installation_type':"ubuntu",
              "feature":"cuda", 
              "image_create_retries":3, 
              "script_inst_retries":5,

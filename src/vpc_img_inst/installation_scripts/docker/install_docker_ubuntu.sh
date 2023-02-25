@@ -1,7 +1,8 @@
 #!/bin/bash
-
-apt-get update
-apt-get -y install \
+# if running on ubuntu22 config the needrestart to restart services automatically instead of interactive mode
+[[ -f /etc/needrestart/needrestart.conf ]] && sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
+sudo apt-get update
+sudo apt-get -y install \
     ca-certificates \
     curl \
     gnupg \

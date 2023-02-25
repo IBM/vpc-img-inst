@@ -24,7 +24,7 @@ class VPCConfig(ConfigBuilder):
 
         self.sg_rules = {'outbound_tcp_all': 'selected security group is missing rule permitting outbound TCP access\n',
                         'inbound_tcp_22': 'selected security group is missing rule permitting inbound traffic to tcp port 22 required for ssh\n',}  # security group rules.
-        self.vpc_name = 'temp-vpc'
+        self.vpc_name = 'temp-vpc-img-inst'
         
     def _get_region(self):
         region = None

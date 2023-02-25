@@ -10,9 +10,13 @@ Mostly tested with Fedora 35/37 and Ubuntu 20/22, but should work with most Linu
 - Python3.
 
 #### Installation
-- `pip install vpc-img-inst`  
+Run: `pip install vpc-img-inst`  
 Following installation, a directory containing various scripts will be created in  `~/.vpc-img-inst`.   
-Note - the directory will not be created or overwritten if it already exists. 
+#### Upgrading
+When upgrading to a newer version, to get an updated version of the scripts, it's important the keep the following points in mind:
+- Delete `~/.vpc-img-inst`, as existing directories won't be replaced to avoid overwriting user scripts. 
+- Upgrade using the following flags: `pip install --no-cache-dir -U vpc-img-inst`.  
+Technical reasoning: for the tool to execute commands post the pip install phase, `whl` files can't be used, instead opting to use the downloaded `tar` instead.
 
 ## Usage
 - Create a new custom image:
@@ -22,9 +26,9 @@ vpc-img-inst [--iam-api-key IAM_API_KEY] [--region REGION] [-o OUTPUT_FOLDER] [-
 ```
 ```vpc-img-inst --help```
 ### Examples
-- `vpc-img-inst -a <API_KEY> -y -f cuda -it rhel-8 -im ibm-redhat-8-6`  
+- `vpc-img-inst -a <API_KEY> -y -f cuda -it rhel -im ibm-redhat-8-6`  
 Create a custom image of CUDA on RHEL 8.6
-- `vpc-img-inst -a <API_KEY> -y -f docker -f cuda -it ubuntu-22` (using default base image)  
+- `vpc-img-inst -a <API_KEY> -y -f docker -f cuda -it ubuntu` (using default base image)  
 Create a custom image of Docker and CUDA on Ubuntu (default 22.4) 
 - `vpc-img-inst --help`  
 Get a short description of the available flags via  
