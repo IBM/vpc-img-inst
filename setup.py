@@ -46,8 +46,8 @@ find_packages(where='src',exclude=['logs'])
 
 setup(
     name='vpc-img-inst',
-    version='1.0.0b11',
-    author =' Omer-J-Cohen',
+    version='1.0.0b12',
+    author ='Omer-J-Cohen',
     author_email = 'omer.cohen@ibm.com',
     description = 'vpc-img-inst is a lightweight script for quick-and-dirty generation of custom VSI images by installing features (software bundles) on base images.',
     long_description=read('README.md'),
