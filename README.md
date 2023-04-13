@@ -1,6 +1,7 @@
 # Image Installer For IBM-VPC
 
-vpc-img-inst is a lightweight script for quick-and-dirty generation of custom VSI images by installing features (software bundles) on base images.
+`vpc-img-inst` is a lightweight script for quick-and-dirty generation of custom VSI images by installing features (software bundles) on base images.  
+For an overview and a quick start consider reading our [blog](https://medium.com/@erezh/how-to-get-ibm-vpc-images-with-cuda-and-other-features-easily-6786127ab4e5).
 
 ## Setup
 
